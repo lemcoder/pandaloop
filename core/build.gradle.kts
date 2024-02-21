@@ -9,11 +9,9 @@ kotlin {
     androidTarget()
 
     sourceSets {
-        commonMain.configure { }
-        commonTest.configure {
-            dependencies {
-                implementation(kotlin("test"))
-            }
+        commonMain.dependencies { }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
         }
 
         val androidInstrumentedTest by getting {
@@ -35,15 +33,16 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
+            // Add application binary interfaces for intel devices (emulators)
             abiFilters += listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
         }
     }
 
-    sourceSets {
-        getByName("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        }
-    }
+//    sourceSets {
+//        getByName("main") {
+//            manifest.srcFile("src/androidMain/AndroidManifest.xml")
+//        }
+//    }
 
     externalNativeBuild {
         cmake {
