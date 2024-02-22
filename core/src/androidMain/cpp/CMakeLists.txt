@@ -4,6 +4,6 @@ set(CMAKE_C_STANDARD 99)
 
 file(GLOB_RECURSE sources "../../../native/*.c")
 
-add_library(sha256 SHARED ${sources})
+add_library(pl_engine SHARED ${sources})
 
-target_link_libraries(sha256)
+target_link_libraries(pl_engine)
