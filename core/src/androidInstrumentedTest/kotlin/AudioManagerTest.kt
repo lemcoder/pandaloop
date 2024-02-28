@@ -5,7 +5,7 @@ import org.junit.Test
 class AudioManagerTest {
     @Test
     fun shouldGetDevicesCount() {
-        val deviceInfo = AudioManager.getDevicesInfo()
-        assert(deviceInfo == 0)
+        val deviceInfo = AudioManager.getPlaybackDevicesCount()
+        assert(deviceInfo == 1)
     }
 }

@@ -15,8 +15,7 @@ kotlin {
         }
 
         androidMain.dependencies {
-//            implementation(libs.jna)
-            implementation("net.java.dev.jna:jna:5.14.0@aar")
+            implementation(libs.jna.get()) { artifact { type = "aar" } }
         }
 
         val androidInstrumentedTest by getting {
