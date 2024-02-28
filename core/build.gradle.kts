@@ -14,6 +14,11 @@ kotlin {
             implementation(kotlin("test"))
         }
 
+        androidMain.dependencies {
+//            implementation(libs.jna)
+            implementation("net.java.dev.jna:jna:5.14.0@aar")
+        }
+
         val androidInstrumentedTest by getting {
             dependencies {
                 implementation(libs.androidX.testRunner)

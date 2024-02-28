@@ -1,12 +1,14 @@
 [versions]
 
 android-gradleplugin = "8.3.0-rc02"
+jna = "5.14.0"
 kotlin = "2.0.0-Beta4"
 android-runner = "1.5.2"
 
 [libraries]
 
 androidX-testRunner = { group = "androidx.test", name = "runner", version.ref = "android-runner" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 
 [plugins]
 
