@@ -21,6 +21,7 @@ kotlin {
         val androidInstrumentedTest by getting {
             dependencies {
                 implementation(libs.androidX.testRunner)
+                implementation(libs.test.rules)
             }
         }
     }
@@ -33,7 +34,6 @@ android {
         minSdk = 24
         multiDexEnabled = true
         namespace = "pl.lemanski.pandaloop"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {

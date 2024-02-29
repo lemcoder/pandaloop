@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.4.1)
 project("pandaloop")
 set(CMAKE_C_STANDARD 99)
 
-file(GLOB_RECURSE sources "../../../native/*.c")
+set(sources
+        ../../../native/audio_recorder.c
+        ../../../native/device_manager.c
+)
 
 add_library(pl_engine SHARED ${sources})
 
