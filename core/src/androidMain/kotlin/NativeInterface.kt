@@ -18,7 +18,5 @@ interface NativeInterface : Library {
     fun startRecording(): Int
 
     fun stopRecording(): Int
-
-    fun getSomeBooty(): Int
 }
 

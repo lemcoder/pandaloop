@@ -7,6 +7,7 @@ set(sources
         ../../../native/device_manager.c
 )
 
+find_library( log-lib log )
 add_library(pl_engine SHARED ${sources})
 
-target_link_libraries(pl_engine)
+target_link_libraries(pl_engine ${log-lib})

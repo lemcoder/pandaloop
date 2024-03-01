@@ -1,19 +1,24 @@
 package pl.lemanski.pandaloop
 
 import com.sun.jna.Memory
-import com.sun.jna.Pointer
-import com.sun.jna.ptr.PointerByReference
+import com.sun.jna.Native
 
 actual object AudioRecorder {
-    actual fun initializeRecordingDevice(buffer: FloatArray): Int {
-        val nativeMemory = Memory((buffer.size * Float.SIZE_BYTES).toLong())
+    private var recordingBufferSize: Int = 0
+    private lateinit var recordingBuffer: Memory
 
-        for (i in buffer.indices) {
-            nativeMemory.setFloat(i * Float.SIZE_BYTES.toLong(), buffer[i])
+    actual fun initializeRecordingDevice(bufferSize: Long) {
+        // Allocate memory for the buffer
+        val memory = Memory(Native.getNativeSize(Float::class.java) * bufferSize)
+
+        // Call native method passing the Memory pointer
+        val result = NativeInterface.Instance.initializeRecordingDevice(memory)
+        if (result != 0) {
+            throw RuntimeException("Failed to initialize recording device")
         }
 
-        val bufferPointer: Pointer = nativeMemory
-        return NativeInterface.Instance.initializeRecordingDevice(bufferPointer)
+        recordingBufferSize = bufferSize.toInt()
+        recordingBuffer = memory // assign memory for buffer
     }
 
     actual fun uninitalizeRecordingDevice(): Int {
@@ -28,7 +33,7 @@ actual object AudioRecorder {
         return NativeInterface.Instance.stopRecording()
     }
 
-    fun getBooty(): Int {
-        return NativeInterface.Instance.getSomeBooty()
+    fun getBuffer(): FloatArray {
+        return recordingBuffer.getFloatArray(0, recordingBufferSize)
     }
 }

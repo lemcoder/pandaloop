@@ -1,6 +1,7 @@
 #include "miniaudio/miniaudio.h"
 #include <stdlib.h>
 #include <string.h>
+#include "logging.h"
 
 #ifndef PANDALOOP_AUDIORECORDER_H
 #define PANDALOOP_AUDIORECORDER_H
@@ -14,11 +15,7 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
 {
     float* buffer = (float*)pDevice->pUserData;
     memcpy(buffer, pInput, frameCount * CHANNEL_COUNT * sizeof(float));
-}
-
-int getSomeBooty()
-{
-    return 0;
+    LOGE("data_callback called");
 }
 
 int initializeRecordingDevice(float* buffer)
