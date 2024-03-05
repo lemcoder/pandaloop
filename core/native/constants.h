@@ -1,0 +1,11 @@
+//
+// Created by lenovo on 05.03.2024.
+//
+
+#ifndef PANDALOOP_CONSTANTS_H
+#define PANDALOOP_CONSTANTS_H
+
+#define CHANNEL_COUNT 2
+#define SAMPLE_RATE 44100
+
+#endif //PANDALOOP_CONSTANTS_H

@@ -4,6 +4,7 @@ set(CMAKE_C_STANDARD 99)
 
 set(sources
         ../../../native/audio_recorder.c
+        ../../../native/audio_player.c
         ../../../native/device_manager.c
 )
 
