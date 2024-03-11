@@ -6,6 +6,7 @@ set(sources
         ../../../native/audio_recorder.c
         ../../../native/audio_player.c
         ../../../native/device_manager.c
+        ../../../native/resource_manager.c
 )
 
 find_library( log-lib log )
