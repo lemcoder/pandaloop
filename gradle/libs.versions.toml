@@ -1,6 +1,6 @@
 [versions]
 
-android-gradleplugin = "8.3.0-rc02"
+android-gradleplugin = "8.3.1"
 jna = "5.14.0"
 kotlin = "2.0.0-Beta4"
 

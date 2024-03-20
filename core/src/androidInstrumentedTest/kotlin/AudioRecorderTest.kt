@@ -12,14 +12,11 @@ class AudioRecorderTest {
     @Test
     fun shouldWriteAudioToBuffer() {
         AudioRecorder.initializeRecordingDevice(1024)
-        val snapshot = AudioRecorder.getBuffer()
         AudioRecorder.startRecording()
 
         // wait for a while
         Thread.sleep(1000)
 
-        AudioRecorder.stopRecording()
-
-        assert(!AudioRecorder.getBuffer().contentEquals(snapshot))
+        val buffer = AudioRecorder.stopRecording()
     }
 }

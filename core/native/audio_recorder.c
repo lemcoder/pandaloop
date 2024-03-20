@@ -3,72 +3,71 @@
 #include <string.h>
 #include "logging.h"
 #include "constants.h"
+#include <unistd.h>
 
 #ifndef PANDALOOP_AUDIORECORDER_H
 #define PANDALOOP_AUDIORECORDER_H
 
 static ma_device device;
-static ma_context context;
+static void *recordedBuffer = NULL;
+static ma_uint32 recordedFrameCount = 0;
 
-static void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
-{
-    float* buffer = (float*)pDevice->pUserData;
-    memcpy(buffer, pInput, frameCount * CHANNEL_COUNT * sizeof(float));
-}
+static void capture_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
+    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(pDevice->capture.format, pDevice->capture.channels);
 
-int initializeRecordingDevice(float* buffer)
-{
-    ma_result result;
-
-    result = ma_context_init(NULL, 0, NULL, &context);
-
-    if (result != MA_SUCCESS) {
-        LOGD("Failed to initialize miniaudio context.\n");
-        return MA_ERROR;
+    if (recordedBuffer == NULL) {
+        recordedBuffer = malloc((recordedFrameCount + frameCount) * bytesPerFrame);
+    } else {
+        recordedBuffer = realloc(recordedBuffer, (recordedFrameCount + frameCount) * bytesPerFrame);
+        if (recordedBuffer == NULL) {
+            LOGE("Realloc failed at %d", recordedFrameCount + frameCount);
+            return;
+        }
     }
 
-    ma_device_config deviceConfig = ma_device_config_init(ma_device_type_capture);
+    LOGE("Input address: %zu", (intptr_t) pInput);
+    ma_copy_pcm_frames(ma_offset_pcm_frames_ptr(recordedBuffer, recordedFrameCount, pDevice->capture.format, pDevice->capture.channels), pInput, frameCount, pDevice->capture.format, pDevice->capture.channels);
+    recordedFrameCount += frameCount;
+    LOGE("Total frames written: %u", recordedFrameCount);
+}
+
+int initializeRecordingDevice() {
+    ma_result result;
+    ma_device_config deviceConfig;
+
+    deviceConfig = ma_device_config_init(ma_device_type_capture);
     deviceConfig.capture.format = ma_format_f32;
     deviceConfig.capture.channels = CHANNEL_COUNT;
+    deviceConfig.noFixedSizedCallback = MA_TRUE;
     deviceConfig.sampleRate = SAMPLE_RATE;
-    deviceConfig.dataCallback = data_callback;
-    deviceConfig.pUserData = buffer;
+    deviceConfig.dataCallback = capture_data_callback;
 
-    result = ma_device_init(&context, &deviceConfig, &device);
+    result = ma_device_init(NULL, &deviceConfig, &device);
     if (result != MA_SUCCESS) {
-        LOGD("Failed to initialize recording device.\n");
-        ma_context_uninit(&context);
+        LOGE("Failed to initialize capture device.");
         return MA_ERROR;
     }
 
     return MA_SUCCESS;
 }
 
-void uninitalizeRecordingDevice()
-{
+void uninitalizeRecordingDevice() {
     ma_device_uninit(&device);
-    ma_context_uninit(&context);
 }
 
-void stopRecording()
-{
+void *stopRecording() {
     ma_device_stop(&device);
+    return recordedBuffer;
 }
 
-int startRecording()
-{
-    ma_result result;
-    result = ma_device_start(&device);
-    if (result != MA_SUCCESS) {
-        LOGD("Failed to start recording.\n");
+int startRecording() {
+    if (ma_device_start(&device) != MA_SUCCESS) {
         ma_device_uninit(&device);
-        ma_context_uninit(&context);
+        printf("Failed to start device.\n");
         return MA_ERROR;
     }
-
-    LOGD("Recording started. \n");
 
     return MA_SUCCESS;
 }
 
-#endif //PANDALOOP_AUDIOPLAYER_H
+#endif //PANDALOOP_AUDIORECORDER_H
