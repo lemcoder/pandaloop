@@ -25,10 +25,8 @@ static void capture_data_callback(ma_device *pDevice, void *pOutput, const void 
         }
     }
 
-    LOGE("Input address: %zu", (intptr_t) pInput);
     ma_copy_pcm_frames(ma_offset_pcm_frames_ptr(recordedBuffer, recordedFrameCount, pDevice->capture.format, pDevice->capture.channels), pInput, frameCount, pDevice->capture.format, pDevice->capture.channels);
     recordedFrameCount += frameCount;
-    LOGE("Total frames written: %u", recordedFrameCount);
 }
 
 int initializeRecordingDevice() {
@@ -63,7 +61,7 @@ void *stopRecording() {
 int startRecording() {
     if (ma_device_start(&device) != MA_SUCCESS) {
         ma_device_uninit(&device);
-        printf("Failed to start device.\n");
+        LOGE("Failed to start device.\n");
         return MA_ERROR;
     }
 

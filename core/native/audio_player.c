@@ -1,4 +1,5 @@
 #include <string.h>
+#include <malloc.h>
 #include "miniaudio/miniaudio.h."
 #include "logging.h"
 #include "constants.h"
@@ -8,35 +9,39 @@
 
 #include "miniaudio/miniaudio.h"
 
-static ma_device device;
-static ma_context context;
+static ma_sound sound;
+static ma_decoder decoder;
+static ma_engine engine;
+static void* playbackBuffer;
+static ma_decoder_config config;
 
-static void data_callback(ma_device *pDevice, void *pOutput, const void *pInput,
-                            ma_uint32 frameCount) {
-    float *buffer = (float *) pDevice->pUserData;
-    memcpy(pOutput, buffer, frameCount * CHANNEL_COUNT * sizeof(float));
-}
-
-int initializePlaybackDevice(float *buffer) {
+int initializePlaybackDevice(void *buffer, size_t bufferSize) {
     ma_result result;
 
-    result = ma_context_init(NULL, 0, NULL, &context);
+    playbackBuffer = malloc(bufferSize);
+    memcpy(playbackBuffer, buffer, bufferSize);
+
+    config.encodingFormat = ma_encoding_format_wav;
+    config.format = ma_format_f32;
+    config.channels = CHANNEL_COUNT;
+    config.sampleRate = SAMPLE_RATE;
+
+    result = ma_engine_init(NULL, &engine);
     if (result != MA_SUCCESS) {
-        LOGD("Failed to initialize miniaudio context.\n");
+        LOGE("Failed to initialize engine: %d", result);
         return MA_ERROR;
     }
 
-    ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
-    deviceConfig.playback.format = ma_format_f32;
-    deviceConfig.playback.channels = CHANNEL_COUNT;
-    deviceConfig.sampleRate = SAMPLE_RATE;
-    deviceConfig.dataCallback = data_callback;
-    deviceConfig.pUserData = buffer;
-
-    result = ma_device_init(&context, &deviceConfig, &device);
+    result = ma_decoder_init_file("/data/user/0/pl.lemanski.pandaloop.test/cache/test2.wav", NULL, &decoder);
+    // result = ma_decoder_init_memory(playbackBuffer, bufferSize, &config, &decoder);
     if (result != MA_SUCCESS) {
-        LOGD("Failed to initialize playback device.\n");
-        ma_context_uninit(&context);
+        LOGE("Failed to initialize decoder: %d", result);
+        return MA_ERROR;
+    }
+
+    result = ma_sound_init_from_data_source(&engine, &decoder, 0, NULL, &sound);
+    if (result != MA_SUCCESS) {
+        LOGE("Failed to initialize sound.\n");
         return MA_ERROR;
     }
 
@@ -44,17 +49,18 @@ int initializePlaybackDevice(float *buffer) {
 }
 
 void uninitalizePlaybackDevice() {
-    ma_device_uninit(&device);
-    ma_context_uninit(&context);
+    ma_decoder_uninit(&decoder);
+    ma_sound_uninit(&sound);
 }
 
 int startPlayback() {
     ma_result result;
-    result = ma_device_start(&device);
+    ma_sound_seek_to_pcm_frame(&sound, 0);
+
+    result = ma_sound_start(&sound);
     if (result != MA_SUCCESS) {
         LOGD("Failed to start playback.\n");
-        ma_device_uninit(&device);
-        ma_context_uninit(&context);
+        uninitalizePlaybackDevice();
         return MA_ERROR;
     }
 
@@ -64,7 +70,8 @@ int startPlayback() {
 }
 
 void stopPlayback() {
-    ma_device_stop(&device);
+    ma_sound_stop(&sound);
+    LOGD("Playback stopped. \n");
 }
 
 #endif // PANDALOOP_AUDIOPLAYER_H

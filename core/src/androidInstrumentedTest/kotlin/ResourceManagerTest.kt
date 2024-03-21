@@ -22,10 +22,13 @@ class ResourceManagerTest {
     @Test
     fun shouldSaveTheBuffer() {
         val path = instrumentationContext.cacheDir.absolutePath + "/test2.wav"
+        if (File(path).exists()) {
+            File(path).delete()
+        }
 
-        AudioRecorder.initializeRecordingDevice(88200)
+        AudioRecorder.initializeRecordingDevice(44100 / 10)
         AudioRecorder.startRecording()
-        Thread.sleep(2000)
+        Thread.sleep(100)
         val recordedBuffer = AudioRecorder.stopRecording()
 
         // Save the file
