@@ -13,7 +13,7 @@ interface NativeInterface : Library {
     fun getPlaybackDevicesCount(): Int
 
     /* audio_recorder.c */
-    fun initializeRecordingDevice(): Int
+    fun initializeRecordingDevice(sizeInFrames: Int): Int
     fun uninitalizeRecordingDevice(): Int
     fun startRecording(): Int
     fun stopRecording(): Pointer

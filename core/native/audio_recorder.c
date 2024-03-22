@@ -11,16 +11,28 @@
 static ma_device device;
 static void *recordedBuffer = NULL;
 static ma_uint32 recordedFrameCount = 0;
+static ma_uint32 requiredSizeInFrames;
 
 static void capture_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
     ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(pDevice->capture.format, pDevice->capture.channels);
+    ma_uint32 bytesToSave;
+
+    if (recordedFrameCount == requiredSizeInFrames) {
+        return;
+    }
+
+    if (recordedFrameCount + frameCount > requiredSizeInFrames) {
+        bytesToSave = requiredSizeInFrames - recordedFrameCount;
+    } else {
+        bytesToSave = frameCount;
+    }
 
     if (recordedBuffer == NULL) {
-        recordedBuffer = malloc((recordedFrameCount + frameCount) * bytesPerFrame);
+        recordedBuffer = malloc((recordedFrameCount + bytesToSave) * bytesPerFrame);
     } else {
-        recordedBuffer = realloc(recordedBuffer, (recordedFrameCount + frameCount) * bytesPerFrame);
+        recordedBuffer = realloc(recordedBuffer, (recordedFrameCount + bytesToSave) * bytesPerFrame);
         if (recordedBuffer == NULL) {
-            LOGE("Realloc failed at %d", recordedFrameCount + frameCount);
+            LOGE("Realloc failed at %d", recordedFrameCount + bytesToSave);
             return;
         }
     }
@@ -29,9 +41,10 @@ static void capture_data_callback(ma_device *pDevice, void *pOutput, const void 
     recordedFrameCount += frameCount;
 }
 
-int initializeRecordingDevice() {
+int initializeRecordingDevice(int sizeInFrames) {
     ma_result result;
     ma_device_config deviceConfig;
+    requiredSizeInFrames = sizeInFrames;
 
     deviceConfig = ma_device_config_init(ma_device_type_capture);
     deviceConfig.capture.format = ma_format_f32;
@@ -51,10 +64,12 @@ int initializeRecordingDevice() {
 
 void uninitalizeRecordingDevice() {
     ma_device_uninit(&device);
+    LOGD("Uninitialized device");
 }
 
 void *stopRecording() {
     ma_device_stop(&device);
+    LOGD("Stopped recording");
     return recordedBuffer;
 }
 

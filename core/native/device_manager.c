@@ -1,4 +1,7 @@
 #define MINIAUDIO_IMPLEMENTATION
+#define MA_ENABLE_ONLY_SPECIFIC_BACKENDS
+#define MA_NO_RUNTIME_LINKING
+#define MA_ENABLE_OPENSL
 
 #include "miniaudio/miniaudio.h"
 #include <stdlib.h>

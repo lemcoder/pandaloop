@@ -9,7 +9,6 @@ set(sources
         ../../../native/resource_manager.c
 )
 
-find_library( log-lib log )
 add_library(pl_engine SHARED ${sources})
 
-target_link_libraries(pl_engine ${log-lib})
+target_link_libraries(pl_engine log OpenSLES)

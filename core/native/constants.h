@@ -1,7 +1,3 @@
-//
-// Created by lenovo on 05.03.2024.
-//
-
 #ifndef PANDALOOP_CONSTANTS_H
 #define PANDALOOP_CONSTANTS_H
 
