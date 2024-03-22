@@ -15,30 +15,30 @@ static ma_uint32 requiredSizeInFrames;
 
 static void capture_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
     ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(pDevice->capture.format, pDevice->capture.channels);
-    ma_uint32 bytesToSave;
+    ma_uint32 framesToSave;
 
     if (recordedFrameCount == requiredSizeInFrames) {
         return;
     }
 
     if (recordedFrameCount + frameCount > requiredSizeInFrames) {
-        bytesToSave = requiredSizeInFrames - recordedFrameCount;
+        framesToSave = requiredSizeInFrames - recordedFrameCount;
     } else {
-        bytesToSave = frameCount;
+        framesToSave = frameCount;
     }
 
     if (recordedBuffer == NULL) {
-        recordedBuffer = malloc((recordedFrameCount + bytesToSave) * bytesPerFrame);
+        recordedBuffer = malloc((recordedFrameCount + framesToSave) * bytesPerFrame);
     } else {
-        recordedBuffer = realloc(recordedBuffer, (recordedFrameCount + bytesToSave) * bytesPerFrame);
+        recordedBuffer = realloc(recordedBuffer, (recordedFrameCount + framesToSave) * bytesPerFrame);
         if (recordedBuffer == NULL) {
-            LOGE("Realloc failed at %d", recordedFrameCount + bytesToSave);
+            LOGE("Realloc failed at %d", recordedFrameCount + framesToSave);
             return;
         }
     }
 
     ma_copy_pcm_frames(ma_offset_pcm_frames_ptr(recordedBuffer, recordedFrameCount, pDevice->capture.format, pDevice->capture.channels), pInput, frameCount, pDevice->capture.format, pDevice->capture.channels);
-    recordedFrameCount += frameCount;
+    recordedFrameCount += framesToSave;
 }
 
 int initializeRecordingDevice(int sizeInFrames) {

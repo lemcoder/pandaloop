@@ -19,13 +19,12 @@ interface NativeInterface : Library {
     fun stopRecording(): Pointer
 
     /* audio_player.c */
-    fun initializePlaybackDevice(buffer: Pointer, bufferSize: Int): Int
+    fun initializePlaybackDevice(buffer: Pointer, sizeInFrames: Int): Int
     fun uninitalizePlaybackDevice()
     fun startPlayback(): Int
     fun stopPlayback()
 
     /* resource_manager.c*/
-    fun loadAudioFile(path: Pointer): Pointer
     fun saveAudioFile(path: Pointer, buffer: Pointer, bufferSize: Long): Int
     fun getBytesPerFrame(): Int
 }

@@ -9,39 +9,47 @@
 
 #include "miniaudio/miniaudio.h"
 
-static ma_sound sound;
-static ma_decoder decoder;
-static ma_engine engine;
-static void* playbackBuffer;
-static ma_decoder_config config;
+static ma_device device;
+static void *playbackBuffer;
+ma_uint64 playbackBufferSizeInFrames;
+ma_uint64 framesPlayed;
 
-int initializePlaybackDevice(void *buffer, size_t bufferSize) {
+static void playback_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
+    ma_uint32 framesToPlay;
+
+    if (framesPlayed == playbackBufferSizeInFrames) {
+        return;
+    }
+
+    if (framesPlayed + frameCount > playbackBufferSizeInFrames) {
+        framesToPlay = playbackBufferSizeInFrames - framesPlayed;
+    } else {
+        framesToPlay = frameCount;
+    }
+
+    ma_copy_pcm_frames(pOutput, ma_offset_pcm_frames_ptr(playbackBuffer, framesPlayed, pDevice->playback.format, pDevice->playback.channels), frameCount, pDevice->playback.format, pDevice->playback.channels);
+    framesPlayed += framesToPlay;
+}
+
+int initializePlaybackDevice(void *buffer, int sizeInFrames) {
     ma_result result;
+    ma_device_config deviceConfig;
+    playbackBufferSizeInFrames = sizeInFrames;
 
-    playbackBuffer = malloc(bufferSize);
-    memcpy(playbackBuffer, buffer, bufferSize);
+    ma_uint64 sizeInBytes = sizeInFrames * ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
+    playbackBuffer = malloc(sizeInBytes);
+    memcpy(playbackBuffer, buffer, sizeInBytes);
 
-    config.encodingFormat = ma_encoding_format_wav;
-    config.format = ma_format_f32;
-    config.channels = CHANNEL_COUNT;
-    config.sampleRate = SAMPLE_RATE;
+    deviceConfig = ma_device_config_init(ma_device_type_playback);
+    deviceConfig.playback.format = ma_format_f32;
+    deviceConfig.playback.channels = CHANNEL_COUNT;
+    deviceConfig.noFixedSizedCallback = MA_TRUE;
+    deviceConfig.sampleRate = SAMPLE_RATE;
+    deviceConfig.dataCallback = playback_data_callback;
 
-    result = ma_engine_init(NULL, &engine);
+    result = ma_device_init(NULL, &deviceConfig, &device);
     if (result != MA_SUCCESS) {
-        LOGE("Failed to initialize engine: %d", result);
-        return MA_ERROR;
-    }
-
-    result = ma_decoder_init_file("/data/user/0/pl.lemanski.pandaloop.test/cache/test2.wav", NULL, &decoder);
-    // result = ma_decoder_init_memory(playbackBuffer, bufferSize, &config, &decoder);
-    if (result != MA_SUCCESS) {
-        LOGE("Failed to initialize decoder: %d", result);
-        return MA_ERROR;
-    }
-
-    result = ma_sound_init_from_data_source(&engine, &decoder, 0, NULL, &sound);
-    if (result != MA_SUCCESS) {
-        LOGE("Failed to initialize sound.\n");
+        LOGE("Failed to initialize playback device.");
         return MA_ERROR;
     }
 
@@ -49,15 +57,13 @@ int initializePlaybackDevice(void *buffer, size_t bufferSize) {
 }
 
 void uninitalizePlaybackDevice() {
-    ma_decoder_uninit(&decoder);
-    ma_sound_uninit(&sound);
+    ma_device_uninit(&device);
 }
 
 int startPlayback() {
     ma_result result;
-    ma_sound_seek_to_pcm_frame(&sound, 0);
 
-    result = ma_sound_start(&sound);
+    result = ma_device_start(&device);
     if (result != MA_SUCCESS) {
         LOGD("Failed to start playback.\n");
         uninitalizePlaybackDevice();
@@ -70,7 +76,7 @@ int startPlayback() {
 }
 
 void stopPlayback() {
-    ma_sound_stop(&sound);
+    ma_device_stop(&device);
     LOGD("Playback stopped. \n");
 }
 
