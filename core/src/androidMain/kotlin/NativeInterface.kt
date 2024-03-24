@@ -4,28 +4,29 @@ import com.sun.jna.Library
 import com.sun.jna.Native
 import com.sun.jna.Pointer
 
+@Suppress("FunctionName")
 interface NativeInterface : Library {
     companion object {
-        val Instance = Native.load("pl_engine", NativeInterface::class.java)
+        val Instance: NativeInterface = Native.load("pl_engine", NativeInterface::class.java)
     }
 
     /* device_manager.c */
-    fun getPlaybackDevicesCount(): Int
+    fun get_playback_devices_count(): Int
 
     /* audio_recorder.c */
-    fun initializeRecordingDevice(sizeInFrames: Int): Int
-    fun uninitalizeRecordingDevice(): Int
-    fun startRecording(): Int
-    fun stopRecording(): Pointer
+    fun initialize_recording_device(sizeInFrames: Int): Int
+    fun uninitalize_recording_device(): Int
+    fun start_recording(): Int
+    fun stop_recording(): Pointer
 
     /* audio_player.c */
-    fun initializePlaybackDevice(buffer: Pointer, sizeInFrames: Int): Int
-    fun uninitalizePlaybackDevice()
-    fun startPlayback(): Int
-    fun stopPlayback()
+    fun initialize_playback_device(buffer: Pointer, sizeInFrames: Int): Int
+    fun uninitalize_playback_device()
+    fun start_playback(): Int
+    fun stop_playback()
 
     /* resource_manager.c*/
-    fun saveAudioFile(path: Pointer, buffer: Pointer, bufferSize: Long): Int
-    fun getBytesPerFrame(): Int
+    fun save_audio_file(path: Pointer, buffer: Pointer, bufferSize: Long): Int
+    fun get_bytes_per_frame(): Int
 }
 

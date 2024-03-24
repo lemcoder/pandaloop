@@ -31,7 +31,7 @@ static void playback_data_callback(ma_device *pDevice, void *pOutput, const void
     framesPlayed += framesToPlay;
 }
 
-int initializePlaybackDevice(void *buffer, int sizeInFrames) {
+int initialize_playback_device(void *buffer, int sizeInFrames) {
     ma_result result;
     ma_device_config deviceConfig;
     playbackBufferSizeInFrames = sizeInFrames;
@@ -56,17 +56,17 @@ int initializePlaybackDevice(void *buffer, int sizeInFrames) {
     return MA_SUCCESS;
 }
 
-void uninitalizePlaybackDevice() {
+void uninitalize_playback_device() {
     ma_device_uninit(&device);
 }
 
-int startPlayback() {
+int start_playback() {
     ma_result result;
 
     result = ma_device_start(&device);
     if (result != MA_SUCCESS) {
         LOGD("Failed to start playback.\n");
-        uninitalizePlaybackDevice();
+        uninitalize_playback_device();
         return MA_ERROR;
     }
 
@@ -75,7 +75,7 @@ int startPlayback() {
     return MA_SUCCESS;
 }
 
-void stopPlayback() {
+void stop_playback() {
     ma_device_stop(&device);
     LOGD("Playback stopped. \n");
 }

@@ -14,7 +14,7 @@ typedef struct {
     ma_uint32 captureCount;
 } DeviceInfo;
 
-int getPlaybackDevicesCount() {
+int get_playback_devices_count() {
     ma_context context;
     if (ma_context_init(NULL, 0, NULL, &context) != MA_SUCCESS) {
         return MA_ERROR;

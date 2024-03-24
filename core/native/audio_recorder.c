@@ -14,7 +14,6 @@ static ma_uint32 recordedFrameCount = 0;
 static ma_uint32 requiredSizeInFrames;
 
 static void capture_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
-    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(pDevice->capture.format, pDevice->capture.channels);
     ma_uint32 framesToSave;
 
     if (recordedFrameCount == requiredSizeInFrames) {
@@ -27,24 +26,13 @@ static void capture_data_callback(ma_device *pDevice, void *pOutput, const void 
         framesToSave = frameCount;
     }
 
-    if (recordedBuffer == NULL) {
-        recordedBuffer = malloc((recordedFrameCount + framesToSave) * bytesPerFrame);
-    } else {
-        recordedBuffer = realloc(recordedBuffer, (recordedFrameCount + framesToSave) * bytesPerFrame);
-        if (recordedBuffer == NULL) {
-            LOGE("Realloc failed at %d", recordedFrameCount + framesToSave);
-            return;
-        }
-    }
-
     ma_copy_pcm_frames(ma_offset_pcm_frames_ptr(recordedBuffer, recordedFrameCount, pDevice->capture.format, pDevice->capture.channels), pInput, frameCount, pDevice->capture.format, pDevice->capture.channels);
     recordedFrameCount += framesToSave;
 }
 
-int initializeRecordingDevice(int sizeInFrames) {
+int initialize_recording_device(int sizeInFrames) {
     ma_result result;
     ma_device_config deviceConfig;
-    requiredSizeInFrames = sizeInFrames;
 
     deviceConfig = ma_device_config_init(ma_device_type_capture);
     deviceConfig.capture.format = ma_format_f32;
@@ -52,6 +40,10 @@ int initializeRecordingDevice(int sizeInFrames) {
     deviceConfig.noFixedSizedCallback = MA_TRUE;
     deviceConfig.sampleRate = SAMPLE_RATE;
     deviceConfig.dataCallback = capture_data_callback;
+
+    requiredSizeInFrames = sizeInFrames;
+    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(deviceConfig.capture.format, deviceConfig.capture.channels);
+    recordedBuffer = malloc(sizeInFrames * bytesPerFrame);
 
     result = ma_device_init(NULL, &deviceConfig, &device);
     if (result != MA_SUCCESS) {
@@ -62,18 +54,18 @@ int initializeRecordingDevice(int sizeInFrames) {
     return MA_SUCCESS;
 }
 
-void uninitalizeRecordingDevice() {
+void uninitalize_recording_device() {
     ma_device_uninit(&device);
     LOGD("Uninitialized device");
 }
 
-void *stopRecording() {
+void *stop_recording() {
     ma_device_stop(&device);
     LOGD("Stopped recording");
     return recordedBuffer;
 }
 
-int startRecording() {
+int start_recording() {
     if (ma_device_start(&device) != MA_SUCCESS) {
         ma_device_uninit(&device);
         LOGE("Failed to start device.\n");

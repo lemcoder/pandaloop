@@ -7,7 +7,7 @@
 #ifndef PANDALOOP_RESOURCE_MANAGER_C
 #define PANDALOOP_RESOURCE_MANAGER_C
 
-int saveAudioFile(const char *path, float *buffer, int bufferSize) {
+int save_audio_file(const char *path, float *buffer, int bufferSize) {
     ma_encoder_config config = ma_encoder_config_init(ma_encoding_format_wav, ma_format_f32, CHANNEL_COUNT, SAMPLE_RATE);
 
     ma_encoder encoder;
@@ -30,7 +30,7 @@ int saveAudioFile(const char *path, float *buffer, int bufferSize) {
     return MA_SUCCESS;
 }
 
-int getBytesPerFrame() {
+int get_bytes_per_frame() {
     return ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
 }
 

@@ -19,18 +19,13 @@ class AudioPlayerTest {
 
     @Test
     fun shouldPlayAudioFromBuffer() {
-        AudioRecorder.initializeRecordingDevice(88200)
+        AudioRecorder.initializeRecordingDevice(441)
         AudioRecorder.startRecording()
-        Thread.sleep(2200)
         val buffer = AudioRecorder.stopRecording()
         AudioRecorder.uninitalizeRecordingDevice()
 
         AudioPlayer.initializePlaybackDevice(buffer)
         AudioPlayer.startPlayback()
-
-        // wait for a while
-        Thread.sleep(2000)
-
         AudioPlayer.stopPlayback()
     }
 

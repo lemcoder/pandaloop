@@ -26,9 +26,8 @@ class ResourceManagerTest {
             File(path).delete()
         }
 
-        AudioRecorder.initializeRecordingDevice(88200)
+        AudioRecorder.initializeRecordingDevice(441)
         AudioRecorder.startRecording()
-        Thread.sleep(2200)
         val recordedBuffer = AudioRecorder.stopRecording()
 
         // Save the file

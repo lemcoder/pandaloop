@@ -16,7 +16,7 @@ actual object ResourceManager {
             pBuffer.setByte(i.toLong(), buffer[i])
         }
 
-        val result = NativeInterface.Instance.saveAudioFile(pPath, pBuffer, bufferSize.toLong())
+        val result = NativeInterface.Instance.save_audio_file(pPath, pBuffer, bufferSize.toLong())
         if (result == -1) {
             throw RuntimeException("Failed to save file")
         }
