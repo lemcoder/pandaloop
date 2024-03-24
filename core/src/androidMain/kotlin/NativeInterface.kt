@@ -14,14 +14,15 @@ interface NativeInterface : Library {
     fun get_playback_devices_count(): Int
 
     /* audio_recorder.c */
-    fun initialize_recording_device(sizeInFrames: Int): Int
-    fun uninitalize_recording_device(): Int
+    fun initialize_recording(sizeInFrames: Int): Int
+    fun uninitalize_recording(): Int
     fun start_recording(): Int
     fun stop_recording(): Pointer
 
     /* audio_player.c */
-    fun initialize_playback_device(buffer: Pointer, sizeInFrames: Int): Int
-    fun uninitalize_playback_device()
+    fun initialize_playback_memory(buffer: Pointer, sizeInFrames: Int): Int
+    fun initialize_playback_file(path: Pointer): Int
+    fun uninitalize_playback()
     fun start_playback(): Int
     fun stop_playback()
 

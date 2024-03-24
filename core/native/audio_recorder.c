@@ -9,9 +9,9 @@
 #define PANDALOOP_AUDIORECORDER_H
 
 static ma_device device;
-static void *recordedBuffer = NULL;
+static void *pCaptureBuffer = NULL;
 static ma_uint32 recordedFrameCount = 0;
-static ma_uint32 requiredSizeInFrames;
+static ma_uint32 requiredSizeInFrames = 0;
 
 static void capture_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
     ma_uint32 framesToSave;
@@ -26,11 +26,11 @@ static void capture_data_callback(ma_device *pDevice, void *pOutput, const void 
         framesToSave = frameCount;
     }
 
-    ma_copy_pcm_frames(ma_offset_pcm_frames_ptr(recordedBuffer, recordedFrameCount, pDevice->capture.format, pDevice->capture.channels), pInput, frameCount, pDevice->capture.format, pDevice->capture.channels);
+    ma_copy_pcm_frames(ma_offset_pcm_frames_ptr(pCaptureBuffer, recordedFrameCount, pDevice->capture.format, pDevice->capture.channels), pInput, frameCount, pDevice->capture.format, pDevice->capture.channels);
     recordedFrameCount += framesToSave;
 }
 
-int initialize_recording_device(int sizeInFrames) {
+int initialize_recording(int sizeInFrames) {
     ma_result result;
     ma_device_config deviceConfig;
 
@@ -41,31 +41,45 @@ int initialize_recording_device(int sizeInFrames) {
     deviceConfig.sampleRate = SAMPLE_RATE;
     deviceConfig.dataCallback = capture_data_callback;
 
-    requiredSizeInFrames = sizeInFrames;
-    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(deviceConfig.capture.format, deviceConfig.capture.channels);
-    recordedBuffer = malloc(sizeInFrames * bytesPerFrame);
-
     result = ma_device_init(NULL, &deviceConfig, &device);
     if (result != MA_SUCCESS) {
         LOGE("Failed to initialize capture device.");
         return MA_ERROR;
     }
 
+    requiredSizeInFrames = sizeInFrames;
+    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(deviceConfig.capture.format, deviceConfig.capture.channels);
+    pCaptureBuffer = malloc(sizeInFrames * bytesPerFrame);
+    if (pCaptureBuffer == NULL) {
+        LOGE("Failed to allocate memory for buffer.");
+        return MA_ERROR;
+    }
+
     return MA_SUCCESS;
 }
 
-void uninitalize_recording_device() {
+void uninitalize_recording() {
     ma_device_uninit(&device);
-    LOGD("Uninitialized device");
+    recordedFrameCount = 0;
+    requiredSizeInFrames = 0;
+    free(pCaptureBuffer);
+    LOGD("Uninitialized recording");
 }
 
 void *stop_recording() {
     ma_device_stop(&device);
     LOGD("Stopped recording");
-    return recordedBuffer;
+    return pCaptureBuffer;
 }
 
 int start_recording() {
+    recordedFrameCount = 0;
+
+    if (pCaptureBuffer == NULL) {
+        LOGE("Buffer is null. Call initialize first.");
+        return MA_ERROR;
+    }
+
     if (ma_device_start(&device) != MA_SUCCESS) {
         ma_device_uninit(&device);
         LOGE("Failed to start device.\n");

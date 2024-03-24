@@ -19,14 +19,21 @@ class AudioPlayerTest {
 
     @Test
     fun shouldPlayAudioFromBuffer() {
-        AudioRecorder.initializeRecordingDevice(441)
+        AudioRecorder.initializeRecording(441)
         AudioRecorder.startRecording()
         val buffer = AudioRecorder.stopRecording()
-        AudioRecorder.uninitalizeRecordingDevice()
+        AudioRecorder.uninitalizeRecording()
 
-        AudioPlayer.initializePlaybackDevice(buffer)
+        AudioPlayer.initializePlaybackMemory(buffer)
         AudioPlayer.startPlayback()
         AudioPlayer.stopPlayback()
     }
 
+    @Test
+    fun shouldPlaySoundFromFile() {
+        val path = instrumentationContext.cacheDir.absolutePath + "/test2.wav"
+        AudioPlayer.initializePlaybackFile(path)
+        AudioPlayer.startPlayback()
+        AudioPlayer.stopPlayback()
+    }
 }

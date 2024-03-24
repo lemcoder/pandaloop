@@ -26,13 +26,13 @@ class ResourceManagerTest {
             File(path).delete()
         }
 
-        AudioRecorder.initializeRecordingDevice(441)
+        AudioRecorder.initializeRecording(441)
         AudioRecorder.startRecording()
         val recordedBuffer = AudioRecorder.stopRecording()
 
         // Save the file
         ResourceManager.saveAudioFile(path, recordedBuffer)
-        AudioRecorder.uninitalizeRecordingDevice()
+        AudioRecorder.uninitalizeRecording()
 
         assert(File(path).exists())
     }

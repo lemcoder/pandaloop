@@ -9,16 +9,29 @@
 
 #include "miniaudio/miniaudio.h"
 
-static ma_device device;
-static void *playbackBuffer;
-ma_uint64 playbackBufferSizeInFrames;
-ma_uint64 framesPlayed;
+// Memory playback variables
+static ma_device pPlaybackDevice;
+static void *pPlaybackBuffer = NULL;
+static ma_uint64 playbackBufferSizeInFrames = 0;
+static ma_uint64 framesPlayed = 0;
+
+// File playback variables
+static ma_sound sound;
+static ma_decoder decoder;
+static ma_engine engine;
+
+typedef enum {
+    file,
+    memory
+} playbackMode;
+
+static playbackMode currentMode;
 
 static void playback_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
     ma_uint32 framesToPlay;
 
     if (framesPlayed == playbackBufferSizeInFrames) {
-        return;
+        framesPlayed = 0; // default looping
     }
 
     if (framesPlayed + frameCount > playbackBufferSizeInFrames) {
@@ -27,18 +40,13 @@ static void playback_data_callback(ma_device *pDevice, void *pOutput, const void
         framesToPlay = frameCount;
     }
 
-    ma_copy_pcm_frames(pOutput, ma_offset_pcm_frames_ptr(playbackBuffer, framesPlayed, pDevice->playback.format, pDevice->playback.channels), frameCount, pDevice->playback.format, pDevice->playback.channels);
+    ma_copy_pcm_frames(pOutput, ma_offset_pcm_frames_ptr(pPlaybackBuffer, framesPlayed, pDevice->playback.format, pDevice->playback.channels), frameCount, pDevice->playback.format, pDevice->playback.channels);
     framesPlayed += framesToPlay;
 }
 
-int initialize_playback_device(void *buffer, int sizeInFrames) {
+int initialize_playback_memory(void *buffer, int sizeInFrames) {
     ma_result result;
     ma_device_config deviceConfig;
-    playbackBufferSizeInFrames = sizeInFrames;
-
-    ma_uint64 sizeInBytes = sizeInFrames * ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
-    playbackBuffer = malloc(sizeInBytes);
-    memcpy(playbackBuffer, buffer, sizeInBytes);
 
     deviceConfig = ma_device_config_init(ma_device_type_playback);
     deviceConfig.playback.format = ma_format_f32;
@@ -47,28 +55,86 @@ int initialize_playback_device(void *buffer, int sizeInFrames) {
     deviceConfig.sampleRate = SAMPLE_RATE;
     deviceConfig.dataCallback = playback_data_callback;
 
-    result = ma_device_init(NULL, &deviceConfig, &device);
+    result = ma_device_init(NULL, &deviceConfig, &pPlaybackDevice);
     if (result != MA_SUCCESS) {
         LOGE("Failed to initialize playback device.");
+        return MA_ERROR;
+    }
+
+    playbackBufferSizeInFrames = sizeInFrames;
+    // Copy memory to prevent it from being garbage collected when calling from JVM
+    ma_uint64 sizeInBytes = sizeInFrames * ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
+    pPlaybackBuffer = malloc(sizeInBytes);
+    memcpy(pPlaybackBuffer, buffer, sizeInBytes);
+
+    currentMode = memory;
+    return MA_SUCCESS;
+}
+
+int initialize_playback_file(char *path) {
+    ma_result result;
+
+    result = ma_engine_init(NULL, &engine);
+    if (result != MA_SUCCESS) {
+        LOGE("Failed to initialize engine: %d", result);
+        return MA_ERROR;
+    }
+
+    result = ma_decoder_init_file(path, NULL, &decoder);
+    if (result != MA_SUCCESS) {
+        LOGE("Failed to initialize decoder: %d", result);
+        return MA_ERROR;
+    }
+
+    result = ma_sound_init_from_data_source(&engine, &decoder, 0, NULL, &sound);
+    if (result != MA_SUCCESS) {
+        LOGE("Failed to initialize sound.\n");
         return MA_ERROR;
     }
 
     return MA_SUCCESS;
 }
 
-void uninitalize_playback_device() {
-    ma_device_uninit(&device);
+void uninitalize_playback() {
+    switch (currentMode) {
+        case memory:
+            ma_device_uninit(&pPlaybackDevice);
+            framesPlayed = 0;
+            playbackBufferSizeInFrames = 0;
+            free(pPlaybackBuffer);
+            break;
+        case file:
+            ma_decoder_uninit(&decoder);
+            ma_sound_uninit(&sound);
+            break;
+    }
 }
 
 int start_playback() {
     ma_result result;
 
-    result = ma_device_start(&device);
-    if (result != MA_SUCCESS) {
-        LOGD("Failed to start playback.\n");
-        uninitalize_playback_device();
-        return MA_ERROR;
+    switch (currentMode) {
+        case memory:
+            framesPlayed = 0;
+            result = ma_device_start(&pPlaybackDevice);
+            if (result != MA_SUCCESS) {
+                LOGE("Failed to start playback.");
+                uninitalize_playback();
+                return MA_ERROR;
+            }
+            break;
+        case file:
+            ma_sound_seek_to_pcm_frame(&sound, 0);
+            ma_sound_set_looping(&sound, MA_TRUE);
+            result = ma_sound_start(&sound);
+            if (result != MA_SUCCESS) {
+                LOGE("Failed to start playback.");
+                uninitalize_playback();
+                return MA_ERROR;
+            }
+            break;
     }
+
 
     LOGD("Playback started. \n");
 
@@ -76,7 +142,14 @@ int start_playback() {
 }
 
 void stop_playback() {
-    ma_device_stop(&device);
+    switch (currentMode) {
+        case memory:
+            ma_device_stop(&pPlaybackDevice);
+            break;
+        case file:
+            ma_sound_stop(&sound);
+            break;
+    }
     LOGD("Playback stopped. \n");
 }
 
