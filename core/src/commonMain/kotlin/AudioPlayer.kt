@@ -1,9 +1,10 @@
 package pl.lemanski.pandaloop
 
 expect object AudioPlayer {
-    fun initializePlaybackMemory(buffer: ByteArray)
-    fun initializePlaybackFile(path: String)
-    fun uninitalizePlayback()
+    fun initializePlaybackDevice()
+    fun uninitalizePlaybackDevice()
+    fun mixPlaybackMemory(buffer: ByteArray, trackNumber: Int)
+    fun mixPlaybackFile(path: String, trackNumber: Int)
     fun startPlayback()
     fun stopPlayback()
 }

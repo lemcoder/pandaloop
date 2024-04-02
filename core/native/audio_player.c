@@ -9,42 +9,60 @@
 
 #include "miniaudio/miniaudio.h"
 
+#define TRACKS 4
+
+typedef struct {
+    float *data;
+    ma_uint64 sizeInFrames;
+    ma_uint64 cursor;
+} pl_audio_buffer;
+
+int pl_audio_buffer_init(float *data, ma_uint64 sizeInFrames, pl_audio_buffer *buffer) {
+    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
+    ma_uint64 sizeInBytes = sizeInFrames * bytesPerFrame;
+    buffer->data = malloc(sizeInBytes);
+    if (buffer->data == NULL) {
+        LOGE("Failed to initialize buffer. Out of memory");
+        return MA_ERROR;
+    }
+    memcpy(buffer->data, data, sizeInBytes);
+    buffer->sizeInFrames = sizeInFrames;
+    buffer->cursor = 0;
+    return MA_SUCCESS;
+}
+
+void pl_audio_buffer_uninit(pl_audio_buffer *buffer) {
+    free(buffer->data);
+    buffer->sizeInFrames = 0;
+    buffer->cursor = 0;
+}
+
 // Memory playback variables
 static ma_device pPlaybackDevice;
-static void *pPlaybackBuffer = NULL;
+static pl_audio_buffer buffers[TRACKS];
+static float *pPlaybackBuffer = NULL;
 static ma_uint64 playbackBufferSizeInFrames = 0;
-static ma_uint64 framesPlayed = 0;
-
-// File playback variables
-static ma_sound sound;
-static ma_decoder decoder;
-static ma_engine engine;
-
-typedef enum {
-    file,
-    memory
-} playbackMode;
-
-static playbackMode currentMode;
 
 static void playback_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
     ma_uint32 framesToPlay;
-
-    if (framesPlayed == playbackBufferSizeInFrames) {
-        framesPlayed = 0; // default looping
+    // TODO check and sync every buffer
+    if (buffers[0].cursor == playbackBufferSizeInFrames) {
+        buffers[0].cursor = 0; // default looping
     }
 
-    if (framesPlayed + frameCount > playbackBufferSizeInFrames) {
-        framesToPlay = playbackBufferSizeInFrames - framesPlayed;
+    if (buffers[0].cursor + frameCount > playbackBufferSizeInFrames) {
+        framesToPlay = playbackBufferSizeInFrames - buffers[0].cursor;
     } else {
         framesToPlay = frameCount;
     }
 
-    ma_copy_pcm_frames(pOutput, ma_offset_pcm_frames_ptr(pPlaybackBuffer, framesPlayed, pDevice->playback.format, pDevice->playback.channels), frameCount, pDevice->playback.format, pDevice->playback.channels);
-    framesPlayed += framesToPlay;
+    ma_copy_pcm_frames(pOutput, ma_offset_pcm_frames_ptr(pPlaybackBuffer, buffers[0].cursor, pDevice->playback.format, pDevice->playback.channels), frameCount, pDevice->playback.format, pDevice->playback.channels);
+    buffers[0].cursor += framesToPlay;
+
+    (void) pInput;
 }
 
-int initialize_playback_memory(void *buffer, int sizeInFrames) {
+int initialize_playback_device() {
     ma_result result;
     ma_device_config deviceConfig;
 
@@ -58,27 +76,45 @@ int initialize_playback_memory(void *buffer, int sizeInFrames) {
     result = ma_device_init(NULL, &deviceConfig, &pPlaybackDevice);
     if (result != MA_SUCCESS) {
         LOGE("Failed to initialize playback device.");
-        return MA_ERROR;
     }
 
-    playbackBufferSizeInFrames = sizeInFrames;
-    // Copy memory to prevent it from being garbage collected when calling from JVM
-    ma_uint64 sizeInBytes = sizeInFrames * ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
-    pPlaybackBuffer = malloc(sizeInBytes);
-    memcpy(pPlaybackBuffer, buffer, sizeInBytes);
-
-    currentMode = memory;
-    return MA_SUCCESS;
+    return result;
 }
 
-int initialize_playback_file(char *path) {
+int mix_playback_memory(void *buffer, int sizeInFrames, int trackNumber) {
     ma_result result;
 
-    result = ma_engine_init(NULL, &engine);
+    result = pl_audio_buffer_init(buffer, sizeInFrames, &buffers[trackNumber]);
     if (result != MA_SUCCESS) {
-        LOGE("Failed to initialize engine: %d", result);
-        return MA_ERROR;
+        LOGE("Failed to initialize playback memory (%d)", result);
+        return result;
     }
+
+    if (pPlaybackBuffer == NULL) {
+        ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
+        ma_uint64 sizeInBytes = sizeInFrames * bytesPerFrame;
+        pPlaybackBuffer = malloc(sizeInBytes);
+        if (pPlaybackBuffer == NULL) {
+            LOGE("Failed to initialize playback memory");
+            return MA_ERROR;
+        }
+        playbackBufferSizeInFrames = sizeInFrames;
+    }
+
+    result = ma_mix_pcm_frames_f32(pPlaybackBuffer, buffers[trackNumber].data, buffers[trackNumber].sizeInFrames, CHANNEL_COUNT, 1);
+    if (result != MA_SUCCESS) {
+        LOGE("Failed to mix sound (%d)", result);
+    }
+
+    return result;
+}
+
+int mix_playback_file(char *path, int trackNumber) {
+    ma_result result;
+    ma_decoder decoder;
+    ma_uint64 framesAvailable = 0;
+    ma_uint64 framesRead = 0;
+    void *tempBuffer = NULL;
 
     result = ma_decoder_init_file(path, NULL, &decoder);
     if (result != MA_SUCCESS) {
@@ -86,71 +122,42 @@ int initialize_playback_file(char *path) {
         return MA_ERROR;
     }
 
-    result = ma_sound_init_from_data_source(&engine, &decoder, 0, NULL, &sound);
-    if (result != MA_SUCCESS) {
-        LOGE("Failed to initialize sound.\n");
+    ma_decoder_get_available_frames(&decoder, &framesAvailable);
+    tempBuffer = malloc(framesAvailable);
+    if (tempBuffer == NULL) {
+        LOGD("Failed to initialize buffer. Out of memory");
         return MA_ERROR;
     }
 
-    return MA_SUCCESS;
+    while (framesRead < framesAvailable) {
+        ma_decoder_read_pcm_frames(&decoder, tempBuffer, 441, &framesRead);
+    }
+
+    result = mix_playback_memory(tempBuffer, framesAvailable, trackNumber);
+
+    return result;
 }
 
-void uninitalize_playback() {
-    switch (currentMode) {
-        case memory:
-            ma_device_uninit(&pPlaybackDevice);
-            framesPlayed = 0;
-            playbackBufferSizeInFrames = 0;
-            free(pPlaybackBuffer);
-            break;
-        case file:
-            ma_decoder_uninit(&decoder);
-            ma_sound_uninit(&sound);
-            break;
+void uninitalize_playback_device() {
+    ma_device_uninit(&pPlaybackDevice);
+    free(pPlaybackBuffer);
+    for (int i = 0; i < TRACKS; i++) {
+        pl_audio_buffer_uninit(&buffers[i]);
     }
 }
 
 int start_playback() {
     ma_result result;
-
-    switch (currentMode) {
-        case memory:
-            framesPlayed = 0;
-            result = ma_device_start(&pPlaybackDevice);
-            if (result != MA_SUCCESS) {
-                LOGE("Failed to start playback.");
-                uninitalize_playback();
-                return MA_ERROR;
-            }
-            break;
-        case file:
-            ma_sound_seek_to_pcm_frame(&sound, 0);
-            ma_sound_set_looping(&sound, MA_TRUE);
-            result = ma_sound_start(&sound);
-            if (result != MA_SUCCESS) {
-                LOGE("Failed to start playback.");
-                uninitalize_playback();
-                return MA_ERROR;
-            }
-            break;
+    result = ma_device_start(&pPlaybackDevice);
+    if (result != MA_SUCCESS) {
+        LOGE("Failed to start playback.");
     }
 
-
-    LOGD("Playback started. \n");
-
-    return MA_SUCCESS;
+    return result;
 }
 
 void stop_playback() {
-    switch (currentMode) {
-        case memory:
-            ma_device_stop(&pPlaybackDevice);
-            break;
-        case file:
-            ma_sound_stop(&sound);
-            break;
-    }
-    LOGD("Playback stopped. \n");
+    ma_device_stop(&pPlaybackDevice);
 }
 
 #endif // PANDALOOP_AUDIOPLAYER_H
