@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -46,10 +47,21 @@ cklib {
 kotlin {
     jvmToolchain(17)
 
+    val xcFrameworkName = "PandaLoop"
+    val xcf = XCFramework(xcFrameworkName)
+    val iosTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64())
+
+    iosTargets.forEach {
+        it.binaries.framework {
+            baseName = xcFrameworkName
+            binaryOption("bundleId", "org.example.${xcFrameworkName}")
+
+            xcf.add(this)
+            isStatic = true
+        }
+    }
+
     androidTarget()
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
 
     applyDefaultHierarchyTemplate()
     sourceSets {
