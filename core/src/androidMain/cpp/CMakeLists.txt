@@ -3,9 +3,13 @@ project("pandaloop")
 set(CMAKE_C_STANDARD 99)
 
 set(sources
+        ../../../native/audio_recorder.h
         ../../../native/audio_recorder.c
+        ../../../native/audio_player.h
         ../../../native/audio_player.c
+        ../../../native/device_manager.h
         ../../../native/device_manager.c
+        ../../../native/resource_manager.h
         ../../../native/resource_manager.c
 )
 

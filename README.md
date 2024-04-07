@@ -1,8 +1,4 @@
-# Extending a KMM Shared Module With C/C++ Code
-
-This repository contains sample code for [tutotial I've written at Hackernoon](https://hackernoon.com/how-to-extend-a-kmm-shared-module-with-cc-code)
-
-_This tutorial was inspired by [Zipline library](https://github.com/cashapp/zipline)._
+# Audio looping library for Kotlin Multiplatform
 
 ## Content
 

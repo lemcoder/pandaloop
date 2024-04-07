@@ -1,12 +1,7 @@
-#include "miniaudio/miniaudio.h"
-#include <stdlib.h>
-#include <string.h>
-#include "logging.h"
-#include "constants.h"
-#include <unistd.h>
+#include "audio_recorder.h"
 
-#ifndef PANDALOOP_AUDIORECORDER_H
-#define PANDALOOP_AUDIORECORDER_H
+#ifndef PANDALOOP_AUDIORECORDER_C
+#define PANDALOOP_AUDIORECORDER_C
 
 static ma_device device;
 static void *pCaptureBuffer = NULL;
@@ -58,7 +53,7 @@ int initialize_recording(int sizeInFrames) {
     return MA_SUCCESS;
 }
 
-void uninitalize_recording() {
+void uninitialize_recording() {
     ma_device_uninit(&device);
     recordedFrameCount = 0;
     requiredSizeInFrames = 0;
@@ -89,4 +84,4 @@ int start_recording() {
     return MA_SUCCESS;
 }
 
-#endif //PANDALOOP_AUDIORECORDER_H
+#endif //PANDALOOP_AUDIORECORDER_C

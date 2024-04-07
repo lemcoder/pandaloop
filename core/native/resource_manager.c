@@ -1,13 +1,9 @@
-#include <stdlib.h>
-#include "miniaudio/miniaudio.h"
-#include "logging.h"
-#include <string.h>
-#include "constants.h"
+#include "resource_manager.h"
 
 #ifndef PANDALOOP_RESOURCE_MANAGER_C
 #define PANDALOOP_RESOURCE_MANAGER_C
 
-int save_audio_file(const char *path, float *buffer, int bufferSize) {
+int save_audio_file(const char *path, void *buffer, int bufferSize) {
     ma_encoder_config config = ma_encoder_config_init(ma_encoding_format_wav, ma_format_f32, CHANNEL_COUNT, SAMPLE_RATE);
 
     ma_encoder encoder;

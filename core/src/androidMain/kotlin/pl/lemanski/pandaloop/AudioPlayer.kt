@@ -45,8 +45,8 @@ actual object AudioPlayer {
         }
     }
 
-    actual fun uninitalizePlaybackDevice() {
-        NativeInterface.Instance.uninitalize_playback_device()
+    actual fun uninitializePlaybackDevice() {
+        NativeInterface.Instance.uninitialize_playback_device()
     }
 
 

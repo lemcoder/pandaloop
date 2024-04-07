@@ -2,7 +2,8 @@
 
 android-gradleplugin = "8.3.1"
 jna = "5.14.0"
-kotlin = "2.0.0-Beta4"
+kotlin = "2.0.0-Beta5"
+cklib = "0.3.0"
 
 # TEST
 android-runner = "1.5.2"
@@ -21,3 +22,4 @@ test_rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
 android-library = { id = "com.android.library", version.ref = "android-gradleplugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+cklib = { id = "co.touchlab.cklib", version.ref = "cklib" }

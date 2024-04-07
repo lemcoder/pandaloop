@@ -2,7 +2,7 @@ package pl.lemanski.pandaloop
 
 expect object AudioRecorder {
     fun initializeRecording(sizeInFrames: Int)
-    fun uninitalizeRecording(): Int
-    fun startRecording(): Int
+    fun uninitializeRecording()
+    fun startRecording()
     fun stopRecording(): ByteArray
 }

@@ -1,21 +1,13 @@
-#include <string.h>
-#include <malloc.h>
-#include "miniaudio/miniaudio.h."
-#include "logging.h"
-#include "constants.h"
+#include "audio_player.h"
 
-#ifndef PANDALOOP_AUDIOPLAYER_H
-#define PANDALOOP_AUDIOPLAYER_H
+#ifndef PANDALOOP_AUDIOPLAYER_C
+#define PANDALOOP_AUDIOPLAYER_C
 
-#include "miniaudio/miniaudio.h"
-
-#define TRACKS 4
-
-typedef struct {
-    float *data;
-    ma_uint64 sizeInFrames;
-    ma_uint64 cursor;
-} pl_audio_buffer;
+// Memory playback variables
+static ma_device pPlaybackDevice;
+static pl_audio_buffer buffers[TRACKS];
+static float *pPlaybackBuffer = NULL;
+static ma_uint64 playbackBufferSizeInFrames = 0;
 
 int pl_audio_buffer_init(float *data, ma_uint64 sizeInFrames, pl_audio_buffer *buffer) {
     ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
@@ -36,12 +28,6 @@ void pl_audio_buffer_uninit(pl_audio_buffer *buffer) {
     buffer->sizeInFrames = 0;
     buffer->cursor = 0;
 }
-
-// Memory playback variables
-static ma_device pPlaybackDevice;
-static pl_audio_buffer buffers[TRACKS];
-static float *pPlaybackBuffer = NULL;
-static ma_uint64 playbackBufferSizeInFrames = 0;
 
 static void playback_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
     ma_uint32 framesToPlay;
@@ -138,7 +124,7 @@ int mix_playback_file(char *path, int trackNumber) {
     return result;
 }
 
-void uninitalize_playback_device() {
+void uninitialize_playback_device() {
     ma_device_uninit(&pPlaybackDevice);
     free(pPlaybackBuffer);
     for (int i = 0; i < TRACKS; i++) {
@@ -160,4 +146,4 @@ void stop_playback() {
     ma_device_stop(&pPlaybackDevice);
 }
 
-#endif // PANDALOOP_AUDIOPLAYER_H
+#endif // PANDALOOP_AUDIOPLAYER_C

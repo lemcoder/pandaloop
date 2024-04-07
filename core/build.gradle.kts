@@ -1,6 +1,9 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
+    alias(libs.plugins.cklib)
 }
 
 android {
@@ -25,12 +28,40 @@ android {
     }
 }
 
+cklib {
+    config.kotlinVersion = libs.versions.kotlin.get()
+    create("pl_engine") {
+        language = co.touchlab.cklib.gradle.CompileToBitcode.Language.C
+        srcDirs = project.files(file("native"))
+        linkerArgs += listOf(
+            "-lpthread",
+            "-lm",
+            "-framework CoreFoundation",
+            "-framework CoreAudio",
+            "-framework AudioToolbox"
+        )
+    }
+}
+
 kotlin {
     jvmToolchain(17)
 
     androidTarget()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 
+    applyDefaultHierarchyTemplate()
     sourceSets {
+        all {
+            languageSettings {
+                languageVersion = "2.0"
+                compilerOptions {
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                }
+            }
+        }
+
         commonMain.dependencies { }
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -43,6 +74,23 @@ kotlin {
         getByName("androidInstrumentedTest").dependencies {
             implementation(libs.androidX.testRunner)
             implementation(libs.test.rules)
+        }
+
+        iosMain.dependencies {
+
+        }
+
+        targets.withType<KotlinNativeTarget> {
+            val main by compilations.getting
+
+            main.cinterops.create("pl_engine") {
+                headers(
+                    file("native/audio_player.h"),
+                    file("native/audio_recorder.h"),
+                    file("native/device_manager.h"),
+                    file("native/resource_manager.h"),
+                )
+            }
         }
     }
 }

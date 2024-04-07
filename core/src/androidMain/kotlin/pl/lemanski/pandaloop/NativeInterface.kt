@@ -15,7 +15,7 @@ interface NativeInterface : Library {
 
     /* audio_recorder.c */
     fun initialize_recording(sizeInFrames: Int): Int
-    fun uninitalize_recording(): Int
+    fun uninitialize_recording()
     fun start_recording(): Int
     fun stop_recording(): Pointer
 
@@ -23,7 +23,7 @@ interface NativeInterface : Library {
     fun initialize_playback_device(): Int
     fun mix_playback_memory(buffer: Pointer, sizeInFrames: Int, trackNumber: Int): Int
     fun mix_playback_file(path: Pointer, trackNumber: Int): Int
-    fun uninitalize_playback_device()
+    fun uninitialize_playback_device()
     fun start_playback(): Int
     fun stop_playback()
 
@@ -31,4 +31,3 @@ interface NativeInterface : Library {
     fun save_audio_file(path: Pointer, buffer: Pointer, bufferSize: Long): Int
     fun get_bytes_per_frame(): Int
 }
-

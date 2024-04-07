@@ -21,8 +21,4 @@ actual object ResourceManager {
             throw RuntimeException("Failed to save file")
         }
     }
-
-    actual fun loadAudioFile(path: String): ByteArray {
-        return byteArrayOf()
-    }
 }

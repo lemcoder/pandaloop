@@ -1,21 +1,25 @@
 package pl.lemanski.pandaloop
 
 actual object AudioRecorder {
-    private var bufferSizeInFrames = 0;
+    private var bufferSizeInFrames = 0
     actual fun initializeRecording(sizeInFrames: Int) {
         val result = NativeInterface.Instance.initialize_recording(sizeInFrames)
         if (result != 0) {
             throw RuntimeException("Failed to initialize recording device")
         }
-        this.bufferSizeInFrames = sizeInFrames;
+        this.bufferSizeInFrames = sizeInFrames
     }
 
-    actual fun uninitalizeRecording(): Int {
-        return NativeInterface.Instance.uninitalize_recording()
+    actual fun uninitializeRecording() {
+        bufferSizeInFrames = 0
+        NativeInterface.Instance.uninitialize_recording()
     }
 
-    actual fun startRecording(): Int {
-        return NativeInterface.Instance.start_recording()
+    actual fun startRecording() {
+        val result = NativeInterface.Instance.start_recording()
+        if (result != 0) {
+            throw RuntimeException("Failed to start recording")
+        }
     }
 
     actual fun stopRecording(): ByteArray {

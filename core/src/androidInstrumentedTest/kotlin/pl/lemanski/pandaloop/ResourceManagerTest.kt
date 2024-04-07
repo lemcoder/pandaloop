@@ -32,7 +32,7 @@ class ResourceManagerTest {
 
         // Save the file
         ResourceManager.saveAudioFile(path, recordedBuffer)
-        AudioRecorder.uninitalizeRecording()
+        AudioRecorder.uninitializeRecording()
 
         assert(File(path).exists())
     }

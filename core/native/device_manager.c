@@ -1,18 +1,18 @@
+#include "device_manager.h"
+
+#ifndef PANDALOOP_DEVICEMANAGER_C
+#define PANDALOOP_DEVICEMANAGER_C
+
 #define MINIAUDIO_IMPLEMENTATION
 #define MA_ENABLE_ONLY_SPECIFIC_BACKENDS
 #define MA_NO_RUNTIME_LINKING
+#ifdef __ANDROID__
 #define MA_ENABLE_OPENSL
-
+#else
+#define MA_ENABLE_COREAUDIO
+#endif
 #include "miniaudio/miniaudio.h"
 #include <stdlib.h>
-
-#ifndef PANDALOOP_DEVICEMANAGER_H
-#define PANDALOOP_DEVICEMANAGER_H
-
-typedef struct {
-    ma_uint32 playbackCount;
-    ma_uint32 captureCount;
-} DeviceInfo;
 
 int get_playback_devices_count() {
     ma_context context;
@@ -33,4 +33,4 @@ int get_playback_devices_count() {
     return playbackCount;
 }
 
-#endif //PANDALOOP_DEVICEMANAGER_H
+#endif //PANDALOOP_DEVICEMANAGER_C

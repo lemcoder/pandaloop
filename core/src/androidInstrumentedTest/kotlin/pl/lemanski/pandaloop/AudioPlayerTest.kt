@@ -30,25 +30,25 @@ class AudioPlayerTest {
 
         println("-----0-----")
         val buffer0 = recordSound()
-        AudioPlayer.mixPlaybackMemory(buffer0, 0);
+        AudioPlayer.mixPlaybackMemory(buffer0, 0)
 
         Thread.sleep(3000)
 
         println("-----1-----")
         val buffer1 = recordSound()
-        AudioPlayer.mixPlaybackMemory(buffer1, 1);
+        AudioPlayer.mixPlaybackMemory(buffer1, 1)
 
         Thread.sleep(3000)
 
         println("-----2-----")
         val buffer2 = recordSound()
-        AudioPlayer.mixPlaybackMemory(buffer2, 2);
+        AudioPlayer.mixPlaybackMemory(buffer2, 2)
 
         AudioPlayer.startPlayback()
         Thread.sleep(20000)
         AudioPlayer.stopPlayback()
-        AudioRecorder.uninitalizeRecording()
-        AudioPlayer.uninitalizePlaybackDevice()
+        AudioRecorder.uninitializeRecording()
+        AudioPlayer.uninitializePlaybackDevice()
     }
 
     @Test
