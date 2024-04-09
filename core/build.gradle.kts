@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
-    alias(libs.plugins.cklib)
+    // alias(libs.plugins.cklib)
 }
 
 android {
@@ -29,20 +29,20 @@ android {
     }
 }
 
-cklib {
-    config.kotlinVersion = libs.versions.kotlin.get()
-    create("pl_engine") {
-        language = co.touchlab.cklib.gradle.CompileToBitcode.Language.C
-        srcDirs = project.files(file("native"))
-        linkerArgs += listOf(
-            "-lpthread",
-            "-lm",
-            "-framework CoreFoundation",
-            "-framework CoreAudio",
-            "-framework AudioToolbox"
-        )
-    }
-}
+//cklib {
+//    config.kotlinVersion = libs.versions.kotlin.get()
+//    create("pl_engine") {
+//        language = co.touchlab.cklib.gradle.CompileToBitcode.Language.C
+//        srcDirs = project.files(file("native"))
+//        linkerArgs += listOf(
+//            "-lpthread",
+//            "-lm",
+//            "-framework CoreFoundation",
+//            "-framework CoreAudio",
+//            "-framework AudioToolbox"
+//        )
+//    }
+//}
 
 kotlin {
     jvmToolchain(17)

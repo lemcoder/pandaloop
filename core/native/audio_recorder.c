@@ -58,6 +58,7 @@ void uninitialize_recording() {
     recordedFrameCount = 0;
     requiredSizeInFrames = 0;
     free(pCaptureBuffer);
+    pCaptureBuffer = NULL;
     LOGD("Uninitialized recording");
 }
 

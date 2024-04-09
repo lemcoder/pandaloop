@@ -47,15 +47,16 @@ class AudioPlayerTest {
         AudioPlayer.startPlayback()
         Thread.sleep(20000)
         AudioPlayer.stopPlayback()
-        AudioRecorder.uninitializeRecording()
         AudioPlayer.uninitializePlaybackDevice()
     }
 
     @Test
     fun shouldPlaySoundFromFile() {
         val path = instrumentationContext.cacheDir.absolutePath + "/test2.wav"
+        AudioPlayer.initializePlaybackDevice()
         AudioPlayer.mixPlaybackFile(path, 0)
         AudioPlayer.startPlayback()
         AudioPlayer.stopPlayback()
+        AudioPlayer.uninitializePlaybackDevice()
     }
 }

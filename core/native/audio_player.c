@@ -25,6 +25,7 @@ int pl_audio_buffer_init(float *data, ma_uint64 sizeInFrames, pl_audio_buffer *b
 
 void pl_audio_buffer_uninit(pl_audio_buffer *buffer) {
     free(buffer->data);
+    buffer->data = NULL;
     buffer->sizeInFrames = 0;
     buffer->cursor = 0;
 }
@@ -109,14 +110,15 @@ int mix_playback_file(char *path, int trackNumber) {
     }
 
     ma_decoder_get_available_frames(&decoder, &framesAvailable);
-    tempBuffer = malloc(framesAvailable);
+    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
+    tempBuffer = malloc(framesAvailable * bytesPerFrame);
     if (tempBuffer == NULL) {
         LOGD("Failed to initialize buffer. Out of memory");
         return MA_ERROR;
     }
 
     while (framesRead < framesAvailable) {
-        ma_decoder_read_pcm_frames(&decoder, tempBuffer, 441, &framesRead);
+        ma_decoder_read_pcm_frames(&decoder, tempBuffer, framesAvailable, &framesRead);
     }
 
     result = mix_playback_memory(tempBuffer, framesAvailable, trackNumber);
@@ -127,6 +129,7 @@ int mix_playback_file(char *path, int trackNumber) {
 void uninitialize_playback_device() {
     ma_device_uninit(&pPlaybackDevice);
     free(pPlaybackBuffer);
+    pPlaybackBuffer = NULL;
     for (int i = 0; i < TRACKS; i++) {
         pl_audio_buffer_uninit(&buffers[i]);
     }

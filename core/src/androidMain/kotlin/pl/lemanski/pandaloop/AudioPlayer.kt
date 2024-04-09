@@ -21,14 +21,12 @@ actual object AudioPlayer {
 
 
     actual fun mixPlaybackMemory(buffer: ByteArray, trackNumber: Int) {
-        // Allocate memory for the buffer
         val sizeInFrames = buffer.size / NativeInterface.Instance.get_bytes_per_frame()
         val memory = Memory(buffer.size.toLong())
 
         for (i in buffer.indices) {
             memory.setByte(i.toLong(), buffer[i])
         }
-        // Call native method passing the Memory pointer
         val result = NativeInterface.Instance.mix_playback_memory(memory, sizeInFrames, trackNumber)
         if (result != 0) {
             throw RuntimeException("Failed to mix sound from memory")
