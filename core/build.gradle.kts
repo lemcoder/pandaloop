@@ -5,7 +5,11 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
     // alias(libs.plugins.cklib)
+    `maven-publish`
 }
+
+group = "pl.lemanski.pandaloop"
+version = "0.0.1"
 
 android {
     compileSdk = 34
@@ -61,7 +65,9 @@ kotlin {
         }
     }
 
-    androidTarget()
+    androidTarget {
+        publishLibraryVariants("release")
+    }
 
     applyDefaultHierarchyTemplate()
     sourceSets {
@@ -74,13 +80,18 @@ kotlin {
             }
         }
 
-        commonMain.dependencies { }
+        commonMain.dependencies {
+            implementation(libs.kotlinx.coroutines.core)
+        }
+
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
 
         androidMain.dependencies {
-            implementation(libs.jna.get()) { artifact { type = "aar" } }
+            // https://github.com/gradle/gradle/issues/16665
+            implementation("net.java.dev.jna:jna:5.14.0@aar")
+            implementation(libs.androidX.annotation)
         }
 
         getByName("androidInstrumentedTest").dependencies {

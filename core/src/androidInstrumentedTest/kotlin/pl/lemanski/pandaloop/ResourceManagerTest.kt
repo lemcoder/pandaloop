@@ -6,6 +6,11 @@ import androidx.test.rule.GrantPermissionRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import pl.lemanski.pandaloop.engine.initializeRecording
+import pl.lemanski.pandaloop.engine.saveAudioFile
+import pl.lemanski.pandaloop.engine.startRecording
+import pl.lemanski.pandaloop.engine.stopRecording
+import pl.lemanski.pandaloop.engine.uninitializeRecording
 import java.io.File
 
 class ResourceManagerTest {
@@ -26,13 +31,13 @@ class ResourceManagerTest {
             File(path).delete()
         }
 
-        AudioRecorder.initializeRecording(441)
-        AudioRecorder.startRecording()
-        val recordedBuffer = AudioRecorder.stopRecording()
+        initializeRecording(441)
+        startRecording()
+        val recordedBuffer = stopRecording(441)
 
         // Save the file
-        ResourceManager.saveAudioFile(path, recordedBuffer)
-        AudioRecorder.uninitializeRecording()
+        saveAudioFile(path, recordedBuffer)
+        uninitializeRecording()
 
         assert(File(path).exists())
     }

@@ -3,6 +3,9 @@ package pl.lemanski.pandaloop
 import androidx.test.rule.GrantPermissionRule
 import org.junit.Rule
 import org.junit.Test
+import pl.lemanski.pandaloop.engine.initializeRecording
+import pl.lemanski.pandaloop.engine.startRecording
+import pl.lemanski.pandaloop.engine.stopRecording
 
 class AudioRecorderTest {
 
@@ -11,9 +14,9 @@ class AudioRecorderTest {
 
     @Test
     fun shouldWriteAudioToBuffer() {
-        AudioRecorder.initializeRecording(441)
-        AudioRecorder.startRecording()
-        val buffer = AudioRecorder.stopRecording()
+        initializeRecording(441)
+        startRecording()
+        val buffer = stopRecording(441)
         assert(buffer.isNotEmpty())
     }
 }

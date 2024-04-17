@@ -1,11 +1,12 @@
 package pl.lemanski.pandaloop
 
 import org.junit.Test
+import pl.lemanski.pandaloop.engine.getPlaybackDevicesCount
 
 class AudioManagerTest {
     @Test
     fun shouldGetDevicesCount() {
-        val deviceInfo = AudioManager.getPlaybackDevicesCount()
+        val deviceInfo = getPlaybackDevicesCount()
         assert(deviceInfo == 1)
     }
 }

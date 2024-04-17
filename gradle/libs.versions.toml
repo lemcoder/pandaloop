@@ -1,21 +1,21 @@
 [versions]
 
-android-gradleplugin = "8.3.1"
-jna = "5.14.0"
+android-gradleplugin = "8.3.2"
+annotation = "1.7.1"
 kotlin = "2.0.0-Beta5"
 cklib = "0.3.0"
 
 # TEST
 android-runner = "1.5.2"
+kotlinx-coroutines-core = "1.8.1-Beta"
 rules = "1.5.0"
 
 [libraries]
-
-jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
-
 # TEST
 androidX-testRunner = { group = "androidx.test", name = "runner", version.ref = "android-runner" }
-test_rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
+androidX-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
+test-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
 
 [plugins]
 

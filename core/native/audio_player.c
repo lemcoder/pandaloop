@@ -71,26 +71,48 @@ int initialize_playback_device() {
 int mix_playback_memory(void *buffer, int sizeInFrames, int trackNumber) {
     ma_result result;
 
+    for (int i = 0; i < TRACKS; i++) {
+        if (buffers[i].sizeInFrames > 0 && buffers[i].sizeInFrames != sizeInFrames) {
+            LOGE("Cannot mix buffers of different size");
+            return MA_ERROR;
+        }
+    }
+
+    if (buffers[trackNumber].data != NULL) {
+        pl_audio_buffer_uninit(&buffers[trackNumber]);
+    }
+
     result = pl_audio_buffer_init(buffer, sizeInFrames, &buffers[trackNumber]);
     if (result != MA_SUCCESS) {
         LOGE("Failed to initialize playback memory (%d)", result);
         return result;
     }
 
-    if (pPlaybackBuffer == NULL) {
-        ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
-        ma_uint64 sizeInBytes = sizeInFrames * bytesPerFrame;
-        pPlaybackBuffer = malloc(sizeInBytes);
-        if (pPlaybackBuffer == NULL) {
-            LOGE("Failed to initialize playback memory");
-            return MA_ERROR;
-        }
-        playbackBufferSizeInFrames = sizeInFrames;
+    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
+    ma_uint64 sizeInBytes = sizeInFrames * bytesPerFrame;
+
+    if (pPlaybackBuffer != NULL) {
+        free(pPlaybackBuffer);
+        pPlaybackBuffer = NULL;
     }
 
-    result = ma_mix_pcm_frames_f32(pPlaybackBuffer, buffers[trackNumber].data, buffers[trackNumber].sizeInFrames, CHANNEL_COUNT, 1);
-    if (result != MA_SUCCESS) {
-        LOGE("Failed to mix sound (%d)", result);
+    pPlaybackBuffer = malloc(sizeInBytes);
+
+    if (pPlaybackBuffer == NULL) {
+        LOGE("Failed to initialize playback memory");
+        return MA_ERROR;
+    }
+
+    playbackBufferSizeInFrames = sizeInFrames;
+
+    for (int i = 0; i < TRACKS; i++) {
+        if (buffers[i].data != NULL && buffers[i].sizeInFrames == playbackBufferSizeInFrames) {
+            result = ma_mix_pcm_frames_f32(pPlaybackBuffer, buffers[i].data, buffers[i].sizeInFrames, CHANNEL_COUNT, 1);
+            if (result != MA_SUCCESS) {
+                LOGE("Failed to mix sound (%d)", result);
+                return result;
+            }
+        }
     }
 
     return result;
