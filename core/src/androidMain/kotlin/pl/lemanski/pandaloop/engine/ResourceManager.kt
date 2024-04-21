@@ -19,3 +19,13 @@ internal actual fun saveAudioFile(path: String, buffer: ByteArray) {
         throw RuntimeException("Failed to save file")
     }
 }
+
+internal actual fun loadAudioFile(path: String): ByteArray {
+    val pPath: Pointer = Memory(Native.WCHAR_SIZE * (path.length + 1L))
+    pPath.setString(0, path)
+    val pBufferSize: Pointer = Memory(Native.LONG_SIZE + 1L)
+
+    val resultBuffer = NativeInterface.Instance.load_audio_file(pPath, pBufferSize)
+
+    return resultBuffer.getByteBuffer(0, pBufferSize.getLong(0)).array()
+}

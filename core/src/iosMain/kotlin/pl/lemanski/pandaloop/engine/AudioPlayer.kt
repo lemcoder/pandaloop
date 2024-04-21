@@ -28,10 +28,6 @@ internal actual fun mixPlaybackMemory(buffer: ByteArray, trackNumber: Int) {
     mix_playback_memory(buffer.toCValues(), sizeInFrames, trackNumber)
 }
 
-internal actual fun mixPlaybackFile(path: String, trackNumber: Int) {
-    mix_playback_file(path.cstr, trackNumber)
-}
-
 internal actual fun startPlayback() {
     val result = start_playback()
     if (result != 0) {

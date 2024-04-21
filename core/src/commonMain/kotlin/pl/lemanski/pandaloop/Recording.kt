@@ -14,7 +14,7 @@ import pl.lemanski.pandaloop.engine.uninitializeRecording
 import pl.lemanski.pandaloop.internal.Closeable
 import pl.lemanski.pandaloop.utils.millisToFrames
 
-class AudioRecording internal constructor(recordingTimeMs: Int) : Closeable {
+class Recording internal constructor(recordingTimeMs: Int) : Closeable {
     private val frameCount: Int = millisToFrames(recordingTimeMs)
     var recordedBuffer: ByteArray = byteArrayOf()
         private set
@@ -41,16 +41,16 @@ fun recordLoop(timeSignature: TimeSignature, tempo: Int, bars: Int = 1, onRecord
     CoroutineScope(recordingJob).launch {
         withContext(Dispatchers.IO) {
             val totalTimeMs = timeSignature.getTimeWithTempo(tempo) * bars
-            val audioRecording = AudioRecording(totalTimeMs)
+            val recording = Recording(totalTimeMs)
 
-            with(audioRecording) {
+            with(recording) {
                 start()
                 delay(totalTimeMs.toLong())
                 stop()
                 close()
             }
 
-            onRecordingEnd(audioRecording.recordedBuffer)
+            onRecordingEnd(recording.recordedBuffer)
         }
     }
 

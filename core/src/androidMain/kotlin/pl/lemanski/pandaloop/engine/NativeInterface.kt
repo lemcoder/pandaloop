@@ -22,12 +22,12 @@ interface NativeInterface : Library {
     /* audio_player.c */
     fun initialize_playback_device(): Int
     fun mix_playback_memory(buffer: Pointer, sizeInFrames: Int, trackNumber: Int): Int
-    fun mix_playback_file(path: Pointer, trackNumber: Int): Int
     fun uninitialize_playback_device()
     fun start_playback(): Int
     fun stop_playback()
 
     /* resource_manager.c*/
-    fun save_audio_file(path: Pointer, buffer: Pointer, bufferSize: Long): Int
+    fun save_audio_file(pFilePath: Pointer, pBuffer: Pointer, bufferSize: Long): Int
     fun get_bytes_per_frame(): Int
+    fun load_audio_file(pFilePath: Pointer, pBufferSize: Pointer): Pointer
 }

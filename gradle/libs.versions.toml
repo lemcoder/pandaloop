@@ -2,12 +2,14 @@
 
 android-gradleplugin = "8.3.2"
 annotation = "1.7.1"
-kotlin = "2.0.0-Beta5"
+kotlin = "1.9.21"
 cklib = "0.3.0"
+complete-kotlin = "1.1.0"
+
 
 # TEST
 android-runner = "1.5.2"
-kotlinx-coroutines-core = "1.8.1-Beta"
+kotlinx-coroutines-core = "1.8.0"
 rules = "1.5.0"
 
 [libraries]
@@ -23,3 +25,4 @@ android-library = { id = "com.android.library", version.ref = "android-gradleplu
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 cklib = { id = "co.touchlab.cklib", version.ref = "cklib" }
+complete-kotlin = { id = "com.louiscad.complete-kotlin", version.ref = "complete-kotlin" }

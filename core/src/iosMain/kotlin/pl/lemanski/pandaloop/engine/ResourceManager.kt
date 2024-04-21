@@ -11,3 +11,8 @@ internal actual fun saveAudioFile(path: String, buffer: ByteArray) {
         throw RuntimeException("Failed to save file")
     }
 }
+
+// TODO
+internal actual fun loadAudioFile(path: String): ByteArray {
+    return byteArrayOf()
+}

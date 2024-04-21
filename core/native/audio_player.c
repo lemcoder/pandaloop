@@ -118,36 +118,6 @@ int mix_playback_memory(void *buffer, int sizeInFrames, int trackNumber) {
     return result;
 }
 
-int mix_playback_file(char *path, int trackNumber) {
-    ma_result result;
-    ma_decoder decoder;
-    ma_uint64 framesAvailable = 0;
-    ma_uint64 framesRead = 0;
-    void *tempBuffer = NULL;
-
-    result = ma_decoder_init_file(path, NULL, &decoder);
-    if (result != MA_SUCCESS) {
-        LOGE("Failed to initialize decoder: %d", result);
-        return MA_ERROR;
-    }
-
-    ma_decoder_get_available_frames(&decoder, &framesAvailable);
-    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
-    tempBuffer = malloc(framesAvailable * bytesPerFrame);
-    if (tempBuffer == NULL) {
-        LOGD("Failed to initialize buffer. Out of memory");
-        return MA_ERROR;
-    }
-
-    while (framesRead < framesAvailable) {
-        ma_decoder_read_pcm_frames(&decoder, tempBuffer, framesAvailable, &framesRead);
-    }
-
-    result = mix_playback_memory(tempBuffer, framesAvailable, trackNumber);
-
-    return result;
-}
-
 void uninitialize_playback_device() {
     ma_device_uninit(&pPlaybackDevice);
     free(pPlaybackBuffer);

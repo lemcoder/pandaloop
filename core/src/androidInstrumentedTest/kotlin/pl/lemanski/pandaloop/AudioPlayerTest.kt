@@ -8,7 +8,6 @@ import org.junit.Rule
 import org.junit.Test
 import pl.lemanski.pandaloop.engine.initializePlaybackDevice
 import pl.lemanski.pandaloop.engine.initializeRecording
-import pl.lemanski.pandaloop.engine.mixPlaybackFile
 import pl.lemanski.pandaloop.engine.mixPlaybackMemory
 import pl.lemanski.pandaloop.engine.startPlayback
 import pl.lemanski.pandaloop.engine.startRecording
@@ -17,7 +16,7 @@ import pl.lemanski.pandaloop.engine.stopRecording
 import pl.lemanski.pandaloop.engine.uninitializePlaybackDevice
 
 class AudioPlayerTest {
-    lateinit var instrumentationContext: Context
+    private lateinit var instrumentationContext: Context
 
     @Before
     fun setup() {
@@ -42,30 +41,16 @@ class AudioPlayerTest {
         val buffer0 = recordSound()
         mixPlaybackMemory(buffer0, 0)
 
-        Thread.sleep(3000)
-
         println("-----1-----")
         val buffer1 = recordSound()
         mixPlaybackMemory(buffer1, 1)
-
-        Thread.sleep(3000)
 
         println("-----2-----")
         val buffer2 = recordSound()
         mixPlaybackMemory(buffer2, 2)
 
         startPlayback()
-        Thread.sleep(20000)
-        stopPlayback()
-        uninitializePlaybackDevice()
-    }
-
-    @Test
-    fun shouldPlaySoundFromFile() {
-        val path = instrumentationContext.cacheDir.absolutePath + "/test2.wav"
-        initializePlaybackDevice()
-        mixPlaybackFile(path, 0)
-        startPlayback()
+        Thread.sleep(50)
         stopPlayback()
         uninitializePlaybackDevice()
     }
