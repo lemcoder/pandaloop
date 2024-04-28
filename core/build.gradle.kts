@@ -73,7 +73,6 @@ kotlin {
     sourceSets {
         all {
             languageSettings {
-                languageVersion = "2.0"
                 compilerOptions {
                     freeCompilerArgs.add("-Xexpect-actual-classes")
                 }
