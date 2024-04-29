@@ -25,15 +25,15 @@ static void capture_data_callback(ma_device *pDevice, void *pOutput, const void 
     recordedFrameCount += framesToSave;
 }
 
-int initialize_recording(int sizeInFrames) {
+int initialize_recording(int sizeInFrames, pandaloop_context* context) {
     ma_result result;
     ma_device_config deviceConfig;
 
     deviceConfig = ma_device_config_init(ma_device_type_capture);
     deviceConfig.capture.format = ma_format_f32;
-    deviceConfig.capture.channels = CHANNEL_COUNT;
+    deviceConfig.capture.channels = context->channelCount;
     deviceConfig.noFixedSizedCallback = MA_TRUE;
-    deviceConfig.sampleRate = SAMPLE_RATE;
+    deviceConfig.sampleRate = context->sampleRate;
     deviceConfig.dataCallback = capture_data_callback;
 
     result = ma_device_init(NULL, &deviceConfig, &device);

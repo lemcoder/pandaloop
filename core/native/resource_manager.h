@@ -5,12 +5,10 @@
 #include "miniaudio/miniaudio.h"
 #include "logging.h"
 #include <string.h>
-#include "constants.h"
+#include "pandaloop_context.h"
 
-int save_audio_file(const char *pFilePath, void *pBuffer, int bufferSize);
+int save_audio_file(const char *pFilePath, void *pBuffer, int bufferSize, pandaloop_context *context);
 
-int get_bytes_per_frame();
-
-void *load_audio_file(const char *pFilePath, ma_uint64 *pBufferSize);
+void *load_audio_file(const char *pFilePath, ma_uint64 *pBufferSize, pandaloop_context *context);
 
 #endif // PANDALOOP_RESOURCE_MANAGER_H

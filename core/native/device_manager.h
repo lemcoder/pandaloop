@@ -2,12 +2,10 @@
 #define PANDALOOP_DEVICEMANAGER_H
 
 #include "miniaudio/miniaudio.h"
-
-typedef struct {
-    ma_uint32 playbackCount;
-    ma_uint32 captureCount;
-} DeviceInfo;
+#include "pandaloop_context.h"
 
 int get_playback_devices_count();
+
+int get_bytes_per_frame(pandaloop_context *context);
 
 #endif // PANDALOOP_DEVICEMANAGER_H

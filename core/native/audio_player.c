@@ -3,14 +3,17 @@
 #ifndef PANDALOOP_AUDIOPLAYER_C
 #define PANDALOOP_AUDIOPLAYER_C
 
-// Memory playback variables
-static ma_device pPlaybackDevice;
 static pl_audio_buffer buffers[TRACKS];
+static ma_device *pPlaybackDevice = NULL;
 static float *pPlaybackBuffer = NULL;
 static ma_uint64 playbackBufferSizeInFrames = 0;
 
 int pl_audio_buffer_init(float *data, ma_uint64 sizeInFrames, pl_audio_buffer *buffer) {
-    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
+    if (pPlaybackDevice == NULL) {
+        LOGE("Device was not initialized. Call initialize first.");
+        return MA_ERROR;
+    }
+    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, pPlaybackDevice->playback.channels);
     ma_uint64 sizeInBytes = sizeInFrames * bytesPerFrame;
     buffer->data = malloc(sizeInBytes);
     if (buffer->data == NULL) {
@@ -49,20 +52,26 @@ static void playback_data_callback(ma_device *pDevice, void *pOutput, const void
     (void) pInput;
 }
 
-int initialize_playback_device() {
+int initialize_playback_device(pandaloop_context *context) {
     ma_result result;
     ma_device_config deviceConfig;
+    pPlaybackDevice = malloc(sizeof(ma_device));
+    if (pPlaybackDevice == NULL) {
+        LOGE("Failed to allocate memory.");
+        return MA_OUT_OF_MEMORY;
+    }
 
     deviceConfig = ma_device_config_init(ma_device_type_playback);
     deviceConfig.playback.format = ma_format_f32;
-    deviceConfig.playback.channels = CHANNEL_COUNT;
+    deviceConfig.playback.channels = context->channelCount;
     deviceConfig.noFixedSizedCallback = MA_TRUE;
-    deviceConfig.sampleRate = SAMPLE_RATE;
+    deviceConfig.sampleRate = context->sampleRate;
     deviceConfig.dataCallback = playback_data_callback;
 
-    result = ma_device_init(NULL, &deviceConfig, &pPlaybackDevice);
+    result = ma_device_init(NULL, &deviceConfig, pPlaybackDevice);
     if (result != MA_SUCCESS) {
         LOGE("Failed to initialize playback device.");
+        return MA_ERROR;
     }
 
     return result;
@@ -70,6 +79,11 @@ int initialize_playback_device() {
 
 int mix_playback_memory(void *buffer, int sizeInFrames, int trackNumber) {
     ma_result result;
+
+    if (pPlaybackDevice == NULL) {
+        LOGE("Device was not initialized. Call initialize first.");
+        return MA_ERROR;
+    }
 
     for (int i = 0; i < TRACKS; i++) {
         if (buffers[i].sizeInFrames > 0 && buffers[i].sizeInFrames != sizeInFrames) {
@@ -88,7 +102,7 @@ int mix_playback_memory(void *buffer, int sizeInFrames, int trackNumber) {
         return result;
     }
 
-    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
+    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, pPlaybackDevice->playback.channels);
     ma_uint64 sizeInBytes = sizeInFrames * bytesPerFrame;
 
     if (pPlaybackBuffer != NULL) {
@@ -107,7 +121,7 @@ int mix_playback_memory(void *buffer, int sizeInFrames, int trackNumber) {
 
     for (int i = 0; i < TRACKS; i++) {
         if (buffers[i].data != NULL && buffers[i].sizeInFrames == playbackBufferSizeInFrames) {
-            result = ma_mix_pcm_frames_f32(pPlaybackBuffer, buffers[i].data, buffers[i].sizeInFrames, CHANNEL_COUNT, 1);
+            result = ma_mix_pcm_frames_f32(pPlaybackBuffer, buffers[i].data, buffers[i].sizeInFrames, pPlaybackDevice->playback.channels, 1);
             if (result != MA_SUCCESS) {
                 LOGE("Failed to mix sound (%d)", result);
                 return result;
@@ -119,7 +133,8 @@ int mix_playback_memory(void *buffer, int sizeInFrames, int trackNumber) {
 }
 
 void uninitialize_playback_device() {
-    ma_device_uninit(&pPlaybackDevice);
+    ma_device_uninit(pPlaybackDevice);
+    pPlaybackDevice = NULL;
     free(pPlaybackBuffer);
     pPlaybackBuffer = NULL;
     for (int i = 0; i < TRACKS; i++) {
@@ -128,8 +143,13 @@ void uninitialize_playback_device() {
 }
 
 int start_playback() {
+    if (pPlaybackDevice == NULL) {
+        LOGE("Device was not initialized. Call initialize first.");
+        return MA_ERROR;
+    }
+
     ma_result result;
-    result = ma_device_start(&pPlaybackDevice);
+    result = ma_device_start(pPlaybackDevice);
     if (result != MA_SUCCESS) {
         LOGE("Failed to start playback.");
     }
@@ -138,7 +158,12 @@ int start_playback() {
 }
 
 void stop_playback() {
-    ma_device_stop(&pPlaybackDevice);
+    if (pPlaybackDevice == NULL) {
+        LOGE("Device was not initialized. Call initialize first.");
+        return;
+    }
+
+    ma_device_stop(pPlaybackDevice);
 }
 
 #endif // PANDALOOP_AUDIOPLAYER_C

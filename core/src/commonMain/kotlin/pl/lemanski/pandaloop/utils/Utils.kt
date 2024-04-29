@@ -1,4 +1,6 @@
 package pl.lemanski.pandaloop.utils
 
-// FIXME fixed sample rate of 44100
-internal fun millisToFrames(millis: Int): Int = 44_100 * (millis / 1_000) // SAMPLE_RATE / 1000
+import pl.lemanski.pandaloop.engine.getChannelCount
+import pl.lemanski.pandaloop.engine.getSampleRate
+
+internal fun millisToFrames(millis: Int): Int = getSampleRate() * (millis / 1_000) * getChannelCount()

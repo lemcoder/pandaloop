@@ -11,7 +11,9 @@
 #else
 #define MA_ENABLE_COREAUDIO
 #endif
+
 #include "miniaudio/miniaudio.h"
+#include "pandaloop_context.h"
 #include <stdlib.h>
 
 int get_playback_devices_count() {
@@ -20,9 +22,9 @@ int get_playback_devices_count() {
         return MA_ERROR;
     }
 
-    ma_device_info* pPlaybackInfos;
+    ma_device_info *pPlaybackInfos;
     ma_uint32 playbackCount;
-    ma_device_info* pCaptureInfos;
+    ma_device_info *pCaptureInfos;
     ma_uint32 captureCount;
     if (ma_context_get_devices(&context, &pPlaybackInfos, &playbackCount, &pCaptureInfos, &captureCount) != MA_SUCCESS) {
         return MA_ERROR;
@@ -31,6 +33,10 @@ int get_playback_devices_count() {
     ma_context_uninit(&context);
 
     return playbackCount;
+}
+
+int get_bytes_per_frame(pandaloop_context* context) {
+    return ma_get_bytes_per_frame(ma_format_f32, context->channelCount);
 }
 
 #endif //PANDALOOP_DEVICEMANAGER_C

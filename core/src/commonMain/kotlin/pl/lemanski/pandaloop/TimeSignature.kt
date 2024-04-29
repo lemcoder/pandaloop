@@ -1,7 +1,9 @@
 package pl.lemanski.pandaloop
 
+import pl.lemanski.pandaloop.engine.getBytesPerFrame
+import pl.lemanski.pandaloop.engine.getChannelCount
+import pl.lemanski.pandaloop.engine.getSampleRate
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 sealed interface TimeSignature {
     fun getTimeWithTempo(tempo: Int): Int
@@ -21,3 +23,4 @@ data object ThreeFours : TimeSignature {
     }
 }
 
+fun TimeSignature.getBufferSizeInBytesWithTempo(tempo: Int): Long = getSampleRate() * getChannelCount() * getBytesPerFrame() * (getTimeWithTempo(tempo) / 1000L)

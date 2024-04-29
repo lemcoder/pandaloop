@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include "miniaudio/miniaudio.h"
 #include "logging.h"
-#include "constants.h"
+#include "pandaloop_context.h"
 
-#define TRACKS 4
+#define TRACKS 4 // TODO make configurable
 
 typedef struct {
     float *data;
@@ -17,7 +17,7 @@ typedef struct {
 
 int pl_audio_buffer_init(float *data, ma_uint64 sizeInFrames, pl_audio_buffer *buffer);
 void pl_audio_buffer_uninit(pl_audio_buffer *buffer);
-int initialize_playback_device();
+int initialize_playback_device(pandaloop_context* context);
 int mix_playback_memory(void *buffer, int sizeInFrames, int trackNumber);
 void uninitialize_playback_device();
 int start_playback();

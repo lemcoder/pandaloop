@@ -3,8 +3,8 @@
 #ifndef PANDALOOP_RESOURCE_MANAGER_C
 #define PANDALOOP_RESOURCE_MANAGER_C
 
-int save_audio_file(const char *pFilePath, void *pBuffer, int bufferSize) {
-    ma_encoder_config config = ma_encoder_config_init(ma_encoding_format_wav, ma_format_f32, CHANNEL_COUNT, SAMPLE_RATE);
+int save_audio_file(const char *pFilePath, void *pBuffer, int bufferSize, pandaloop_context *context) {
+    ma_encoder_config config = ma_encoder_config_init(ma_encoding_format_wav, ma_format_f32, context->channelCount, context->sampleRate);
 
     ma_encoder encoder;
     if (ma_encoder_init_file(pFilePath, &config, &encoder) != MA_SUCCESS) {
@@ -26,11 +26,7 @@ int save_audio_file(const char *pFilePath, void *pBuffer, int bufferSize) {
     return MA_SUCCESS;
 }
 
-int get_bytes_per_frame() {
-    return ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
-}
-
-void *load_audio_file(const char *pFilePath, ma_uint64 *pBufferSize) {
+void *load_audio_file(const char *pFilePath, ma_uint64 *pBufferSize, pandaloop_context *context) {
     ma_result result;
     ma_decoder decoder;
     ma_uint64 framesAvailable = 0;
@@ -43,7 +39,7 @@ void *load_audio_file(const char *pFilePath, ma_uint64 *pBufferSize) {
     }
 
     ma_decoder_get_available_frames(&decoder, &framesAvailable);
-    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, CHANNEL_COUNT);
+    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, context->channelCount);
     tempBuffer = malloc(framesAvailable * bytesPerFrame);
     if (tempBuffer == NULL) {
         LOGD("Failed to initialize buffer. Out of memory");

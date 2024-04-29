@@ -5,10 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "logging.h"
-#include "constants.h"
+#include "pandaloop_context.h"
 #include <unistd.h>
 
-int initialize_recording(int sizeInFrames);
+int initialize_recording(int sizeInFrames, pandaloop_context* context);
 void uninitialize_recording();
 void *stop_recording();
 int start_recording();
