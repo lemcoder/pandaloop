@@ -10,11 +10,11 @@ enum class TimeSignature {
     THREE_FOURS
 }
 
-fun TimeSignature.getTimeWithTempo(tempo: Int): Int {
+fun TimeSignature.getTimeWithTempo(tempo: Int): Long {
     val beat = 1.minutes.inWholeMilliseconds.toInt() / tempo
     return when (this) {
-        TimeSignature.COMMON      -> 4 * beat
-        TimeSignature.THREE_FOURS -> 3 * beat
+        TimeSignature.COMMON      -> 4L * beat
+        TimeSignature.THREE_FOURS -> 3L * beat
     }
 }
 
