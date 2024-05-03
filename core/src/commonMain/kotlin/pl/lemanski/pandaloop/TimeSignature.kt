@@ -5,21 +5,16 @@ import pl.lemanski.pandaloop.engine.getChannelCount
 import pl.lemanski.pandaloop.engine.getSampleRate
 import kotlin.time.Duration.Companion.minutes
 
-sealed interface TimeSignature {
-    fun getTimeWithTempo(tempo: Int): Int
+enum class TimeSignature {
+    COMMON,
+    THREE_FOURS
 }
 
-data object Common : TimeSignature {
-    override fun getTimeWithTempo(tempo: Int): Int {
-        val beat = 1.minutes.inWholeMilliseconds.toInt() / tempo
-        return 4 * beat
-    }
-}
-
-data object ThreeFours : TimeSignature {
-    override fun getTimeWithTempo(tempo: Int): Int {
-        val beat = 1.minutes.inWholeMilliseconds.toInt() / tempo
-        return 3 * beat
+fun TimeSignature.getTimeWithTempo(tempo: Int): Int {
+    val beat = 1.minutes.inWholeMilliseconds.toInt() / tempo
+    return when (this) {
+        TimeSignature.COMMON      -> 4 * beat
+        TimeSignature.THREE_FOURS -> 3 * beat
     }
 }
 
