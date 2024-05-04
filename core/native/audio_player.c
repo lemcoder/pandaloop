@@ -15,7 +15,7 @@ int pl_audio_buffer_init(float *data, ma_uint64 sizeInFrames, pl_audio_buffer *b
     }
     ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, pPlaybackDevice->playback.channels);
     ma_uint64 sizeInBytes = sizeInFrames * bytesPerFrame;
-    buffer->data = malloc(sizeInBytes);
+    buffer->data = calloc(sizeInBytes, 1);
     if (buffer->data == NULL) {
         LOGE("Failed to initialize buffer. Out of memory");
         return MA_ERROR;
@@ -34,6 +34,11 @@ void pl_audio_buffer_uninit(pl_audio_buffer *buffer) {
 }
 
 static void playback_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
+    if (pPlaybackBuffer == NULL) {
+        LOGE("Playback buffer is null.");
+        return;
+    }
+
     ma_uint32 framesToPlay;
     // TODO check and sync every buffer
     if (buffers[0].cursor == playbackBufferSizeInFrames) {
@@ -110,7 +115,7 @@ int mix_playback_memory(void *buffer, int sizeInFrames, int trackNumber) {
         pPlaybackBuffer = NULL;
     }
 
-    pPlaybackBuffer = malloc(sizeInBytes);
+    pPlaybackBuffer = calloc(sizeInBytes, 1);
 
     if (pPlaybackBuffer == NULL) {
         LOGE("Failed to initialize playback memory");
@@ -140,6 +145,7 @@ void uninitialize_playback_device() {
     for (int i = 0; i < TRACKS; i++) {
         pl_audio_buffer_uninit(&buffers[i]);
     }
+    LOGD("Playback device uninitialized");
 }
 
 int start_playback() {
