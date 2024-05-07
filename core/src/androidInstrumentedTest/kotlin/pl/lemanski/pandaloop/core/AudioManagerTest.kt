@@ -1,4 +1,4 @@
-package pl.lemanski.pandaloop
+package pl.lemanski.pandaloop.core
 
 import org.junit.Test
 import pl.lemanski.pandaloop.core.engine.getPlaybackDevicesCount

@@ -1,5 +1,6 @@
-package pl.lemanski.pandaloop
+package pl.lemanski.pandaloop.core
 
+import android.Manifest
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
@@ -17,7 +18,7 @@ class ResourceManagerTest {
     lateinit var instrumentationContext: Context
 
     @get:Rule
-    var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.RECORD_AUDIO)
+    var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO)
 
     @Before
     fun setup() {

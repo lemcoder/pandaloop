@@ -1,5 +1,6 @@
-package pl.lemanski.pandaloop
+package pl.lemanski.pandaloop.core
 
+import android.Manifest
 import androidx.test.rule.GrantPermissionRule
 import org.junit.Rule
 import org.junit.Test
@@ -10,7 +11,7 @@ import pl.lemanski.pandaloop.core.engine.stopRecording
 class AudioRecorderTest {
 
     @get:Rule
-    var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.RECORD_AUDIO)
+    var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO)
 
     @Test
     fun shouldWriteAudioToBuffer() {

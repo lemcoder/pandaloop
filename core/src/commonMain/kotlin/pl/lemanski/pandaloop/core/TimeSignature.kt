@@ -1,8 +1,6 @@
 package pl.lemanski.pandaloop.core
 
 import pl.lemanski.pandaloop.core.engine.getBytesPerFrame
-import pl.lemanski.pandaloop.core.engine.getChannelCount
-import pl.lemanski.pandaloop.core.engine.getSampleRate
 import kotlin.time.Duration.Companion.minutes
 
 enum class TimeSignature {
@@ -18,4 +16,4 @@ fun TimeSignature.getTimeWithTempo(tempo: Int): Long {
     }
 }
 
-fun TimeSignature.getBufferSizeInBytesWithTempo(tempo: Int): Long = getSampleRate() * getChannelCount() * getBytesPerFrame() * (getTimeWithTempo(tempo) / 1000L)
+fun TimeSignature.getBufferSizeInBytesWithTempo(tempo: Int): Long = PandaLoopContext.sampleRate * PandaLoopContext.channelCount * getBytesPerFrame() * (getTimeWithTempo(tempo) / 1000L)
