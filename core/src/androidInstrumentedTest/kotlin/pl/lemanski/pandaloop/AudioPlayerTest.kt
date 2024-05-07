@@ -6,14 +6,14 @@ import androidx.test.rule.GrantPermissionRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import pl.lemanski.pandaloop.engine.initializePlaybackDevice
-import pl.lemanski.pandaloop.engine.initializeRecording
-import pl.lemanski.pandaloop.engine.mixPlaybackMemory
-import pl.lemanski.pandaloop.engine.startPlayback
-import pl.lemanski.pandaloop.engine.startRecording
-import pl.lemanski.pandaloop.engine.stopPlayback
-import pl.lemanski.pandaloop.engine.stopRecording
-import pl.lemanski.pandaloop.engine.uninitializePlaybackDevice
+import pl.lemanski.pandaloop.core.engine.initializePlaybackDevice
+import pl.lemanski.pandaloop.core.engine.initializeRecording
+import pl.lemanski.pandaloop.core.engine.setPlaybackBuffer
+import pl.lemanski.pandaloop.core.engine.startPlayback
+import pl.lemanski.pandaloop.core.engine.startRecording
+import pl.lemanski.pandaloop.core.engine.stopPlayback
+import pl.lemanski.pandaloop.core.engine.stopRecording
+import pl.lemanski.pandaloop.core.engine.uninitializePlaybackDevice
 
 class AudioPlayerTest {
     private lateinit var instrumentationContext: Context
@@ -36,19 +36,8 @@ class AudioPlayerTest {
     @Test
     fun shouldPlayAudioFromBuffer() {
         initializePlaybackDevice()
-
-        println("-----0-----")
-        val buffer0 = recordSound()
-        mixPlaybackMemory(buffer0, 0)
-
-        println("-----1-----")
-        val buffer1 = recordSound()
-        mixPlaybackMemory(buffer1, 1)
-
-        println("-----2-----")
-        val buffer2 = recordSound()
-        mixPlaybackMemory(buffer2, 2)
-
+        val buffer = recordSound()
+        setPlaybackBuffer(buffer)
         startPlayback()
         Thread.sleep(50)
         stopPlayback()

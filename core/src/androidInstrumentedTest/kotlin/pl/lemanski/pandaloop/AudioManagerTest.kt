@@ -1,7 +1,7 @@
 package pl.lemanski.pandaloop
 
 import org.junit.Test
-import pl.lemanski.pandaloop.engine.getPlaybackDevicesCount
+import pl.lemanski.pandaloop.core.engine.getPlaybackDevicesCount
 
 class AudioManagerTest {
     @Test
