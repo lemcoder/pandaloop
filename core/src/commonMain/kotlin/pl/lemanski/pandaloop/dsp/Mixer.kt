@@ -1,16 +1,22 @@
 package pl.lemanski.pandaloop.dsp
 
+import pl.lemanski.pandaloop.core.PandaLoopContext
+
 class Mixer {
-    fun mixPcmFramesF32(input: FloatArray, output: FloatArray, frameCount: Int, channels: Int, volume: Float): FloatArray {
-        if (input.isEmpty() || output.isEmpty() || channels == 0) {
-            throw InvalidArgsException()
+    fun mixPcmFramesF32(input: FloatArray, output: FloatArray, volume: Float): FloatArray {
+        if (input.isEmpty() || output.isEmpty()) {
+            throw InvalidArgsException("Invalid arguments")
+        }
+
+        if (input.size != output.size) {
+            throw InvalidArgsException("Input and output must be the same size (provided: in[${input.size}] and out[${output.size}])")
         }
 
         if (volume == 0f) {
             return output
         }
 
-        val sampleCount: Int = frameCount * channels
+        val sampleCount: Int = output.size * PandaLoopContext.channelCount
 
         if (volume == 1f) {
             for (i in 0 until sampleCount) {

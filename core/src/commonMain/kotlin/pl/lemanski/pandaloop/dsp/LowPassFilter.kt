@@ -1,7 +1,6 @@
 package pl.lemanski.pandaloop.dsp
 
 import pl.lemanski.pandaloop.core.PandaLoopContext
-import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -9,42 +8,39 @@ class LowPassFilter(
     private val cutoffHz: Int,
     private val input: FloatArray,
 ) : Filter {
+    private val PI: Float = 3.1415927f
+    private val FC: Float = cutoffHz.coerceIn(20, 20_000).toFloat() / PandaLoopContext.sampleRate.toFloat() // Filter cutoff
+    private val M: Int = 100 // Filter length
+    private val H: FloatArray = FloatArray(101) // Low-pass filter kernel
+
+    init {
+        var sum = 0f
+        // Calculate filter kernel
+        for (i in 0..M) {
+            if (i - M / 2 == 0) {
+                H[i] = 2 * PI * FC
+            } else {
+                H[i] = sin(2 * PI * FC * (i - M / 2)) / (i - M / 2)
+            }
+            H[i] *= (0.54f - 0.46f * cos(PI * i / M)) // Hamming window
+            sum += H[i];
+        }
+
+        // Normalize the low-pass kernel
+        for (i in 0..M) {
+            H[i] /= sum
+        }
+    }
+
     override fun apply(): FloatArray {
         val output = FloatArray(input.size)
-        val filterLength = 101 // Filter length
-        val filterKernel = FloatArray(filterLength)
-
-        val fc = cutoffHz / PandaLoopContext.sampleRate // Sampling frequency assumed to be 44100 Hz - filter cutoff in (0 - .5)
-        val pi = PI.toFloat()
-
-        // Calculate filter kernel
-        val sum = filterKernel.indices.sumOf { i ->
-            val n = i - filterLength / 2
-            if (n == 0) {
-                filterKernel[i] = 2 * pi * fc
-            } else {
-                filterKernel[i] = sin(2 * pi * fc * n) / n
+        // Convolve input with filter kernel
+        for (j in M until input.size) {
+            output[j] = 0f
+            for (i in 0..M) {
+                output[j] += H[i] * input[j - i]
             }
-            filterKernel[i] *= (0.54f - 0.46f * cos(pi * i / filterLength.toFloat())) // Hamming window
-            filterKernel[i].toDouble()
-        }.toFloat()
-
-        // Normalize filter kernel
-        for (i in filterKernel.indices) {
-            filterKernel[i] /= sum
         }
-
-        // Apply filter
-        for (j in input.indices) {
-            var filteredValue = 0f
-            for (i in 0 until filterLength) {
-                if (j - i >= 0) {
-                    filteredValue += (filterKernel[i] * input[j - i])
-                }
-            }
-            output[j] = filteredValue
-        }
-
         return output
     }
 }

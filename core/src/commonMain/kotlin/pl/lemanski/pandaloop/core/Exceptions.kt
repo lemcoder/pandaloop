@@ -1,3 +1,3 @@
 package pl.lemanski.pandaloop.core
 
-class InvalidOperationException : Throwable()
+class InvalidOperationException(override val message: String? = null) : Throwable()

@@ -20,7 +20,7 @@ object PandaLoopContext {
             uninitializeRecording()
         }
 
-        this.channelCount = channelCount
-        this.sampleRate = sampleRate
+        this.channelCount = channelCount.coerceIn(1, 2)
+        this.sampleRate = sampleRate.coerceIn(44_100, 48_000)
     }
 }

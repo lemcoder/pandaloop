@@ -80,6 +80,7 @@ kotlin {
         }
 
         commonMain.dependencies {
+            implementation("com.ditchoom:buffer:1.3.38")
         }
 
         commonTest.dependencies {

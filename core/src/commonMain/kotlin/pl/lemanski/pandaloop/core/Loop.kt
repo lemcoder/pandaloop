@@ -8,7 +8,6 @@ import pl.lemanski.pandaloop.core.engine.uninitializePlaybackDevice
 import pl.lemanski.pandaloop.core.internal.Closeable
 
 class Loop : Closeable {
-    private var loopLength: Int = -1
     private var state: State = State.IDLE
 
     init {
@@ -16,18 +15,10 @@ class Loop : Closeable {
     }
 
     fun setBuffer(buffer: ByteArray) {
-        if (loopLength == -1) {
-            loopLength = buffer.size
-        } else {
-            if (buffer.size != loopLength) {
-                throw InvalidOperationException()
-            }
-        }
-
         if (state == State.IDLE) {
             setPlaybackBuffer(buffer)
         } else {
-            throw InvalidOperationException()
+            throw InvalidOperationException("Cannot set buffer while playing")
         }
     }
 
