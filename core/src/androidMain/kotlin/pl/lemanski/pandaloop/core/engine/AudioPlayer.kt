@@ -17,13 +17,13 @@ internal actual fun startPlayback() {
 }
 
 internal actual fun setPlaybackBuffer(buffer: ByteArray) {
-    val sizeInFrames = buffer.size / NativeInterface.Instance.get_bytes_per_frame()
     val memory = Memory(buffer.size.toLong())
 
     for (i in buffer.indices) {
         memory.setByte(i.toLong(), buffer[i])
     }
-    val result = NativeInterface.Instance.set_playback_buffer(memory, sizeInFrames)
+
+    val result = NativeInterface.Instance.set_playback_buffer(memory, buffer.size.toLong())
     if (result != 0) {
         throw RuntimeException("Failed to mix sound from memory")
     }

@@ -15,14 +15,14 @@ internal interface NativeInterface : Library {
     fun get_bytes_per_frame(context: PandaLoopContextStruct = PandaLoopContextStruct()): Int
 
     /* audio_recorder.c */
-    fun initialize_recording(sizeInFrames: Int, context: PandaLoopContextStruct = PandaLoopContextStruct()): Int
+    fun initialize_recording(sizeInBytes: Long, context: PandaLoopContextStruct = PandaLoopContextStruct()): Int
     fun uninitialize_recording()
     fun start_recording(): Int
     fun stop_recording(): Pointer
 
     /* audio_player.c */
     fun initialize_playback_device(context: PandaLoopContextStruct = PandaLoopContextStruct()): Int
-    fun set_playback_buffer(buffer: Pointer, sizeInFrames: Int): Int
+    fun set_playback_buffer(buffer: Pointer, sizeInBytes: Long): Int
     fun uninitialize_playback_device()
     fun start_playback(): Int
     fun stop_playback()

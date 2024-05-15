@@ -5,15 +5,13 @@ import pl.lemanski.pandaloop.core.engine.startRecording
 import pl.lemanski.pandaloop.core.engine.stopRecording
 import pl.lemanski.pandaloop.core.engine.uninitializeRecording
 import pl.lemanski.pandaloop.core.internal.Closeable
-import pl.lemanski.pandaloop.core.utils.millisToFrames
 
-class Recording(recordingTimeMs: Int) : Closeable {
-    private val frameCount: Int = millisToFrames(recordingTimeMs)
+class Recording(private val recordingBufferSize: Long) : Closeable {
     var recordedBuffer: ByteArray = byteArrayOf()
         private set
 
     init {
-        initializeRecording(frameCount)
+        initializeRecording(recordingBufferSize)
     }
 
     fun start() {
@@ -21,7 +19,7 @@ class Recording(recordingTimeMs: Int) : Closeable {
     }
 
     fun stop() {
-        recordedBuffer = stopRecording(frameCount)
+        recordedBuffer = stopRecording(recordingBufferSize)
     }
 
     override fun close() {

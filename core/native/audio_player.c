@@ -4,31 +4,37 @@
 #define PANDALOOP_AUDIOPLAYER_C
 
 static ma_device *pPlaybackDevice = NULL;
-static float *pPlaybackBuffer = NULL;
-static ma_uint64 playbackBufferSizeInFrames = 0;
+static void *pPlaybackBuffer = NULL;
+static ma_uint64 playbackBufferSize = 0;
 static ma_uint64 cursor = 0;
+static ma_uint32 bytesPerFrame = -1;
 
 static void playback_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
-    if (pPlaybackBuffer == NULL) {
+    if (pPlaybackBuffer == NULL || playbackBufferSize == 0 || bytesPerFrame == 0) {
         LOGE("Playback buffer is null.");
         return;
     }
 
-    ma_uint32 framesToPlay;
-    if (cursor == playbackBufferSizeInFrames) {
-        cursor = 0; // default looping
+    ma_uint32 bytesToPlay;
+    ma_uint64 byteCount = frameCount * bytesPerFrame;
+
+    if (cursor >= playbackBufferSize) {
+        cursor = 0; // Loop playback by resetting the cursor
     }
 
-    if (cursor + frameCount > playbackBufferSizeInFrames) {
-        framesToPlay = playbackBufferSizeInFrames - cursor;
+    if (cursor + byteCount > playbackBufferSize) {
+        bytesToPlay = playbackBufferSize - cursor;
+        frameCount = bytesToPlay / bytesPerFrame;
     } else {
-        framesToPlay = frameCount;
+        bytesToPlay = byteCount;
     }
 
-    ma_copy_pcm_frames(pOutput, ma_offset_pcm_frames_ptr(pPlaybackBuffer, cursor, pDevice->playback.format, pDevice->playback.channels), frameCount, pDevice->playback.format, pDevice->playback.channels);
-    cursor += framesToPlay;
+    if (bytesToPlay > 0) {
+        ma_copy_pcm_frames(pOutput, pPlaybackBuffer + cursor, frameCount, pDevice->playback.format, pDevice->playback.channels);
+        cursor += bytesToPlay;
+    }
 
-    (void) pInput;
+    (void) pInput; // Unused parameter
 }
 
 int initialize_playback_device(pandaloop_context *context) {
@@ -53,10 +59,12 @@ int initialize_playback_device(pandaloop_context *context) {
         return MA_ERROR;
     }
 
+    bytesPerFrame = ma_get_bytes_per_frame(deviceConfig.playback.format, deviceConfig.playback.channels);
+
     return result;
 }
 
-int set_playback_buffer(float *buffer, int sizeInFrames) {
+int set_playback_buffer(float *buffer, ma_uint64 sizeInBytes) {
     if (pPlaybackDevice == NULL) {
         LOGE("Device was not initialized. Call initialize first.");
         return MA_ERROR;
@@ -72,14 +80,13 @@ int set_playback_buffer(float *buffer, int sizeInFrames) {
         return MA_ERROR;
     }
 
-    int sizeInBytes = sizeInFrames * ma_get_bytes_per_frame(ma_format_f32, pPlaybackDevice->playback.channels);
     pPlaybackBuffer = calloc(sizeInBytes, 1);
     if (pPlaybackBuffer == NULL) {
         LOGE("Failed to allocate memory");
         return MA_ERROR;
     }
     memcpy(pPlaybackBuffer, buffer, sizeInBytes);
-    playbackBufferSizeInFrames = sizeInFrames;
+    playbackBufferSize = sizeInBytes;
 
     return MA_SUCCESS;
 }

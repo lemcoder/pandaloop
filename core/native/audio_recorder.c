@@ -5,27 +5,38 @@
 
 static ma_device device;
 static void *pCaptureBuffer = NULL;
-static ma_uint32 recordedFrameCount = 0;
-static ma_uint32 requiredSizeInFrames = 0;
+static ma_uint32 recordedBytes = 0;
+static ma_uint32 requiredSizeBytes = -1;
+static int bytesPerFrame = -1;
 
 static void capture_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
-    ma_uint32 framesToSave;
-
-    if (recordedFrameCount == requiredSizeInFrames) {
+    if (pCaptureBuffer == NULL || requiredSizeBytes == -1 || bytesPerFrame == -1) {
+        LOGE("Recording not initialized. Call initialize first");
         return;
     }
 
-    if (recordedFrameCount + frameCount > requiredSizeInFrames) {
-        framesToSave = requiredSizeInFrames - recordedFrameCount;
-    } else {
-        framesToSave = frameCount;
+    ma_uint32 bytesToSave;
+    ma_uint32 byteCount = bytesPerFrame * frameCount;
+
+    if (recordedBytes >= requiredSizeBytes) {
+        return;
     }
 
-    ma_copy_pcm_frames(ma_offset_pcm_frames_ptr(pCaptureBuffer, recordedFrameCount, pDevice->capture.format, pDevice->capture.channels), pInput, frameCount, pDevice->capture.format, pDevice->capture.channels);
-    recordedFrameCount += framesToSave;
+    if (recordedBytes + byteCount > requiredSizeBytes) {
+        bytesToSave = requiredSizeBytes - recordedBytes;
+        // Adjust frameCount to fit the remaining buffer size
+        frameCount = bytesToSave / bytesPerFrame;
+    } else {
+        bytesToSave = byteCount;
+    }
+
+    ma_copy_pcm_frames((ma_uint8 *) pCaptureBuffer + recordedBytes, pInput, frameCount, pDevice->capture.format, pDevice->capture.channels);
+    recordedBytes += bytesToSave;
+
+    (void) pOutput;
 }
 
-int initialize_recording(int sizeInFrames, pandaloop_context* context) {
+int initialize_recording(ma_uint64 sizeInBytes, pandaloop_context *context) {
     ma_result result;
     ma_device_config deviceConfig;
 
@@ -42,9 +53,10 @@ int initialize_recording(int sizeInFrames, pandaloop_context* context) {
         return MA_ERROR;
     }
 
-    requiredSizeInFrames = sizeInFrames;
-    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(deviceConfig.capture.format, deviceConfig.capture.channels);
-    pCaptureBuffer = malloc(sizeInFrames * bytesPerFrame);
+    requiredSizeBytes = sizeInBytes;
+    bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, context->channelCount);
+    pCaptureBuffer = calloc(sizeInBytes, 1);
+
     if (pCaptureBuffer == NULL) {
         LOGE("Failed to allocate memory for buffer.");
         return MA_ERROR;
@@ -55,8 +67,8 @@ int initialize_recording(int sizeInFrames, pandaloop_context* context) {
 
 void uninitialize_recording() {
     ma_device_uninit(&device);
-    recordedFrameCount = 0;
-    requiredSizeInFrames = 0;
+    recordedBytes = 0;
+    requiredSizeBytes = 0;
     free(pCaptureBuffer);
     pCaptureBuffer = NULL;
     LOGD("Uninitialized recording");
@@ -69,7 +81,7 @@ void *stop_recording() {
 }
 
 int start_recording() {
-    recordedFrameCount = 0;
+    recordedBytes = 0;
 
     if (pCaptureBuffer == NULL) {
         LOGE("Buffer is null. Call initialize first.");

@@ -4,8 +4,8 @@ import android.Manifest
 import androidx.annotation.RequiresPermission
 
 @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-internal actual fun initializeRecording(sizeInFrames: Int) {
-    val result = NativeInterface.Instance.initialize_recording(sizeInFrames)
+internal actual fun initializeRecording(sizeInBytes: Long) {
+    val result = NativeInterface.Instance.initialize_recording(sizeInBytes)
     if (result != 0) {
         throw RuntimeException("Failed to initialize recording device")
     }
@@ -25,8 +25,7 @@ internal actual fun startRecording() {
 }
 
 @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-internal actual fun stopRecording(sizeInFrames: Int): ByteArray {
+internal actual fun stopRecording(sizeInBytes: Long): ByteArray {
     val pointer = NativeInterface.Instance.stop_recording()
-    val nativeBufferSize = NativeInterface.Instance.get_bytes_per_frame() * sizeInFrames
-    return pointer.getByteArray(0, nativeBufferSize)
+    return pointer.getByteArray(0, sizeInBytes.toInt().coerceAtLeast(0))
 }

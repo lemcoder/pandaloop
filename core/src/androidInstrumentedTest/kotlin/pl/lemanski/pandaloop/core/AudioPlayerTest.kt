@@ -27,11 +27,11 @@ class AudioPlayerTest {
     @get:Rule
     var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO)
 
-    private fun recordSound(sizeInFrames: Int = 44100): ByteArray {
-        initializeRecording(sizeInFrames)
+    private fun recordSound(sizeInBytes: Long = 44100 * 4): ByteArray {
+        initializeRecording(sizeInBytes)
         startRecording()
-        Thread.sleep(sizeInFrames / 44100 * 1000L)
-        return stopRecording(sizeInFrames)
+        Thread.sleep(sizeInBytes / 44100 * 1000L)
+        return stopRecording(sizeInBytes)
     }
 
     @Test
