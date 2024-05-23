@@ -1,31 +1,17 @@
 package pl.lemanski.pandaloop.core.engine
 
-import com.sun.jna.Memory
-import com.sun.jna.Native
-import com.sun.jna.Pointer
+import pl.lemanski.pandaloop.core.PandaLoopContext
+import pl.lemanski.pandaloop.core.engine.jni.PandaLoop
+import pl.lemanski.pandaloop.dsp.utils.toByteArray
+import pl.lemanski.pandaloop.dsp.utils.toFloatArray
 
 internal actual fun saveAudioFile(path: String, buffer: ByteArray) {
-    val pPath: Pointer = Memory(Native.WCHAR_SIZE * (path.length + 1L))
-    pPath.setString(0, path)
-
-    val bufferSize = buffer.size
-    val pBuffer: Pointer = Memory(bufferSize.toLong())
-    for (i in buffer.indices) {
-        pBuffer.setByte(i.toLong(), buffer[i])
-    }
-
-    val result = NativeInterface.Instance.save_audio_file(pPath, pBuffer, bufferSize.toLong())
+    val result = PandaLoop.save_audio_file(path, buffer.toFloatArray(), buffer.size, PandaLoopContext.channelCount, PandaLoopContext.sampleRate)
     if (result == -1) {
         throw RuntimeException("Failed to save file")
     }
 }
 
-internal actual fun loadAudioFile(path: String): ByteArray {
-    val pPath: Pointer = Memory(Native.WCHAR_SIZE * (path.length + 1L))
-    pPath.setString(0, path)
-    val pBufferSize: Pointer = Memory(Native.LONG_SIZE + 1L)
-
-    val resultBuffer = NativeInterface.Instance.load_audio_file(pPath, pBufferSize)
-
-    return resultBuffer.getByteBuffer(0, pBufferSize.getLong(0)).array()
+internal actual fun loadAudioFile(path: String, fileSize: Long): ByteArray {
+    return PandaLoop.load_audio_file(fileSize, path).toByteArray()
 }

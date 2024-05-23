@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.tasks.factory.registerTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
@@ -17,7 +18,6 @@ android {
 
     defaultConfig {
         minSdk = 24
-        multiDexEnabled = true
         namespace = "pl.lemanski.pandaloop"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -67,7 +67,7 @@ kotlin {
     }
 
     androidTarget {
-        publishLibraryVariants("release")
+        publishAllLibraryVariants()
     }
 
     applyDefaultHierarchyTemplate()
@@ -113,5 +113,17 @@ kotlin {
                 )
             }
         }
+    }
+}
+
+tasks.register("moveSWIGFiles") {
+    copy {
+        from("src/androidMain/cpp/.swig/*.java")
+        to("src/androidMain/kotlin/pl/lemanski/pandaloop/jni")
+    }
+
+    copy {
+        from("src/androidMain/cpp/.swig/*.c")
+        to("native/jni")
     }
 }

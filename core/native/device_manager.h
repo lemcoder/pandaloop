@@ -2,10 +2,9 @@
 #define PANDALOOP_DEVICEMANAGER_H
 
 #include "miniaudio/miniaudio.h"
-#include "pandaloop_context.h"
 
 int get_playback_devices_count();
 
-int get_bytes_per_frame(pandaloop_context *context);
+int get_bytes_per_frame(int channelCount);
 
 #endif // PANDALOOP_DEVICEMANAGER_H

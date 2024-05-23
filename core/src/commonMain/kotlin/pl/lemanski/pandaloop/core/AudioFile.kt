@@ -16,8 +16,12 @@ class AudioFile(
         saveAudioFile(this.path, buffer)
     }
 
+    fun fileLength(): Long {
+        TODO()
+    }
+
     fun load(): ByteArray {
-        return loadAudioFile(path)
+        return loadAudioFile(path, fileLength())
     }
 
     fun delete(): Boolean {

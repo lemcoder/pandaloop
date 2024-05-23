@@ -5,12 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "logging.h"
-#include "pandaloop_context.h"
 #include <unistd.h>
 
-int initialize_recording(long long int sizeInBytes, pandaloop_context* context);
+int initialize_recording(long long int sizeInBytes, int channelCount, int sampleRate);
 void uninitialize_recording();
-void *stop_recording();
+float* stop_recording(long long int sizeInBytes);
 int start_recording();
 
 #endif // PANDALOOP_AUDIORECORDER_H

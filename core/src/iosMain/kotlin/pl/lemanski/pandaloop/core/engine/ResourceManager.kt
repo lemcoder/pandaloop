@@ -13,6 +13,6 @@ internal actual fun saveAudioFile(path: String, buffer: ByteArray) {
 }
 
 // TODO
-internal actual fun loadAudioFile(path: String): ByteArray {
+internal actual fun loadAudioFile(path: String, fileSize: Long): ByteArray {
     return byteArrayOf()
 }

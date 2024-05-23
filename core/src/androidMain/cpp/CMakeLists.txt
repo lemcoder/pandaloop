@@ -21,7 +21,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../native)
 set(SWIG_INTERFACE pandaloop.i)
 set(CMAKE_SWIG_FLAGS -package pl.lemanski.pandaloop.core.engine.jni)
 
-set_property(SOURCE pandaloop.i PROPERTY SWIG_MODULE_NAME Pandaloop)
+set_property(SOURCE pandaloop.i PROPERTY SWIG_MODULE_NAME PandaLoop)
 set(PANDALOOP_SOURCES
         ../../../native/audio_recorder.h
         ../../../native/audio_recorder.c
@@ -42,10 +42,9 @@ swig_add_library(
         pl_engine_swig
         LANGUAGE java
         SOURCES ${SWIG_INTERFACE}
-        OUTFILE_DIR ${CMAKE_SOURCE_DIR}/swig
-        OUTPUT_DIR ${CMAKE_SOURCE_DIR}/swig
+        OUTFILE_DIR ${CMAKE_SOURCE_DIR}/.swig
+        OUTPUT_DIR ${CMAKE_SOURCE_DIR}/.swig
 )
-
 
 target_link_libraries(pl_engine_swig ${JNI_LIBRARIES} pl_engine)
 target_link_libraries(pl_engine log OpenSLES ${JNI_LIBRARIES})

@@ -13,7 +13,6 @@
 #endif
 
 #include "miniaudio/miniaudio.h"
-#include "pandaloop_context.h"
 #include <stdlib.h>
 
 int get_playback_devices_count() {
@@ -35,8 +34,8 @@ int get_playback_devices_count() {
     return playbackCount;
 }
 
-int get_bytes_per_frame(pandaloop_context* context) {
-    return ma_get_bytes_per_frame(ma_format_f32, context->channelCount);
+int get_bytes_per_frame(int channelCount) {
+    return ma_get_bytes_per_frame(ma_format_f32, channelCount);
 }
 
 #endif //PANDALOOP_DEVICEMANAGER_C

@@ -1,38 +1,34 @@
 package pl.lemanski.pandaloop.core.engine
 
-import com.sun.jna.Memory
+import pl.lemanski.pandaloop.core.PandaLoopContext
+import pl.lemanski.pandaloop.core.engine.jni.PandaLoop
+import pl.lemanski.pandaloop.dsp.utils.toFloatArray
 
 internal actual fun initializePlaybackDevice() {
-    val result = NativeInterface.Instance.initialize_playback_device()
+    val result = PandaLoop.initialize_playback_device(PandaLoopContext.channelCount, PandaLoopContext.sampleRate)
     if (result != 0) {
         throw RuntimeException("Failed to initialize playback device")
     }
 }
 
 internal actual fun startPlayback() {
-    val result = NativeInterface.Instance.start_playback()
+    val result = PandaLoop.start_playback()
     if (result != 0) {
         throw RuntimeException("Failed to start playback")
     }
 }
 
 internal actual fun setPlaybackBuffer(buffer: ByteArray) {
-    val memory = Memory(buffer.size.toLong())
-
-    for (i in buffer.indices) {
-        memory.setByte(i.toLong(), buffer[i])
-    }
-
-    val result = NativeInterface.Instance.set_playback_buffer(memory, buffer.size.toLong())
+    val result = PandaLoop.set_playback_buffer(buffer.toFloatArray(), buffer.size.toLong())
     if (result != 0) {
         throw RuntimeException("Failed to mix sound from memory")
     }
 }
 
 internal actual fun uninitializePlaybackDevice() {
-    NativeInterface.Instance.uninitialize_playback_device()
+    PandaLoop.uninitialize_playback_device()
 }
 
 internal actual fun stopPlayback() {
-    NativeInterface.Instance.stop_playback()
+    PandaLoop.stop_playback()
 }
