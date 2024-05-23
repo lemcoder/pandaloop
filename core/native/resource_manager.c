@@ -26,7 +26,7 @@ int save_audio_file(const char *pFilePath, void *pBuffer, int bufferSize, pandal
     return MA_SUCCESS;
 }
 
-void *load_audio_file(const char *pFilePath, ma_uint64 *pBufferSize, pandaloop_context *context) {
+void *load_audio_file(const char *pFilePath, long long int *pBufferSize, pandaloop_context *context) {
     ma_result result;
     ma_decoder decoder;
     ma_uint64 framesAvailable = 0;

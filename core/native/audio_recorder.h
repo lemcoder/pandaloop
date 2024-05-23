@@ -8,7 +8,7 @@
 #include "pandaloop_context.h"
 #include <unistd.h>
 
-int initialize_recording(ma_uint64 sizeInBytes, pandaloop_context* context);
+int initialize_recording(long long int sizeInBytes, pandaloop_context* context);
 void uninitialize_recording();
 void *stop_recording();
 int start_recording();

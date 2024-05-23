@@ -1,4 +1,5 @@
 #include "audio_recorder.h"
+#include <jni.h>
 
 #ifndef PANDALOOP_AUDIORECORDER_C
 #define PANDALOOP_AUDIORECORDER_C
@@ -36,7 +37,7 @@ static void capture_data_callback(ma_device *pDevice, void *pOutput, const void 
     (void) pOutput;
 }
 
-int initialize_recording(ma_uint64 sizeInBytes, pandaloop_context *context) {
+int initialize_recording(long long int sizeInBytes, pandaloop_context *context) {
     ma_result result;
     ma_device_config deviceConfig;
 
@@ -98,3 +99,15 @@ int start_recording() {
 }
 
 #endif //PANDALOOP_AUDIORECORDER_C
+
+
+
+
+
+
+
+
+
+
+
+

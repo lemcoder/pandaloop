@@ -9,7 +9,7 @@
 
 int initialize_playback_device(pandaloop_context *context);
 
-int set_playback_buffer(float *buffer, ma_uint64 sizeInBytes);
+int set_playback_buffer(void *buffer, long long int sizeInBytes);
 
 void uninitialize_playback_device();
 

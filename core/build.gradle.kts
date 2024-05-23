@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
@@ -73,6 +74,7 @@ kotlin {
     sourceSets {
         all {
             languageSettings {
+                @OptIn(ExperimentalKotlinGradlePluginApi::class)
                 compilerOptions {
                     freeCompilerArgs.add("-Xexpect-actual-classes")
                 }
@@ -87,8 +89,6 @@ kotlin {
         }
 
         androidMain.dependencies {
-            // https://github.com/gradle/gradle/issues/16665
-            implementation("net.java.dev.jna:jna:5.14.0@aar")
             implementation(libs.androidX.annotation)
         }
 
