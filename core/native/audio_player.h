@@ -8,7 +8,7 @@
 
 int initialize_playback_device(int channelCount, int sampleRate);
 
-int set_playback_buffer(float buffer[], long long int sizeInBytes);
+int set_playback_buffer(void *buffer, long long int sizeInBytes);
 
 void uninitialize_playback_device();
 

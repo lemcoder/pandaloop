@@ -64,7 +64,7 @@ int initialize_playback_device(int channelCount, int sampleRate) {
     return result;
 }
 
-int set_playback_buffer(float buffer[], long long int sizeInBytes) {
+int set_playback_buffer(void *buffer, long long int sizeInBytes) {
     if (pPlaybackDevice == NULL) {
         LOGE("Device was not initialized. Call initialize first.");
         return MA_ERROR;

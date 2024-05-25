@@ -9,7 +9,7 @@
 
 int initialize_recording(long long int sizeInBytes, int channelCount, int sampleRate);
 void uninitialize_recording();
-float* stop_recording(long long int sizeInBytes);
+void* stop_recording(long long int sizeInBytes);
 int start_recording();
 
 #endif // PANDALOOP_AUDIORECORDER_H

@@ -6,9 +6,9 @@
 #include "logging.h"
 #include <string.h>
 
-int save_audio_file(const char *pFilePath, float *pBuffer, int bufferSize, int channelCount, int sampleRate);
+int save_audio_file(const char *pFilePath, void *pBuffer, int bufferSize, int channelCount, int sampleRate);
 
-float *load_audio_file(long long int bufferSize, const char *pFilePath);
+void *load_audio_file(long long int bufferSize, const char *pFilePath);
 
 // TODO add getFileSize method
 

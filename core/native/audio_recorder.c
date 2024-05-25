@@ -75,11 +75,11 @@ void uninitialize_recording() {
     LOGD("Uninitialized recording");
 }
 
-float *stop_recording(long long int sizeInBytes) {
+void *stop_recording(long long int sizeInBytes) {
     ma_device_stop(&device);
     LOGD("Stopped recording");
 
-    float * tmpBuffer = malloc(sizeInBytes);
+    void *tmpBuffer = malloc(sizeInBytes);
     memcpy(tmpBuffer, pCaptureBuffer, sizeInBytes);
 
     return tmpBuffer;

@@ -11,7 +11,6 @@ object PandaLoop {
     init {
         System.loadLibrary("pl_engine_swig")
     }
-
     fun initialize_recording(sizeInBytes: Long, channelCount: Int, sampleRate: Int): Int {
         return PandaLoopJNI.initialize_recording(sizeInBytes, channelCount, sampleRate)
     }
@@ -20,8 +19,8 @@ object PandaLoop {
         PandaLoopJNI.uninitialize_recording()
     }
 
-    fun stop_recording(sizeInBytes: Long): FloatArray {
-        return PandaLoopJNI.stop_recording(sizeInBytes)!!
+    fun stop_recording(sizeInBytes: Long): ByteArray {
+        return PandaLoopJNI.stop_recording(sizeInBytes) ?: byteArrayOf()
     }
 
     fun start_recording(): Int {
@@ -32,7 +31,7 @@ object PandaLoop {
         return PandaLoopJNI.initialize_playback_device(channelCount, sampleRate)
     }
 
-    fun set_playback_buffer(buffer: FloatArray?, sizeInBytes: Long): Int {
+    fun set_playback_buffer(buffer: ByteArray?, sizeInBytes: Long): Int {
         return PandaLoopJNI.set_playback_buffer(buffer, sizeInBytes)
     }
 
@@ -56,11 +55,11 @@ object PandaLoop {
         return PandaLoopJNI.get_bytes_per_frame(channelCount)
     }
 
-    fun save_audio_file(pFilePath: String?, pBuffer: FloatArray?, bufferSize: Int, channelCount: Int, sampleRate: Int): Int {
+    fun save_audio_file(pFilePath: String?, pBuffer: ByteArray?, bufferSize: Int, channelCount: Int, sampleRate: Int): Int {
         return PandaLoopJNI.save_audio_file(pFilePath, pBuffer, bufferSize, channelCount, sampleRate)
     }
 
-    fun load_audio_file(bufferSize: Long, pFilePath: String?): FloatArray {
-        return PandaLoopJNI.load_audio_file(bufferSize, pFilePath)!!
+    fun load_audio_file(bufferSize: Long, pFilePath: String?): ByteArray {
+        return PandaLoopJNI.load_audio_file(bufferSize, pFilePath) ?: byteArrayOf()
     }
 }

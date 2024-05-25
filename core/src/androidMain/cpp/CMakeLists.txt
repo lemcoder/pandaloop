@@ -35,7 +35,7 @@ set(PANDALOOP_SOURCES
 
 add_library(
         pl_engine
-        SHARED
+        STATIC
         ${PANDALOOP_SOURCES}
 )
 swig_add_library(

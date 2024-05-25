@@ -13,13 +13,13 @@ object PandaLoopJNI {
     @JvmStatic
     external fun uninitialize_recording()
     @JvmStatic
-    external fun stop_recording(jarg1: Long): FloatArray?
+    external fun stop_recording(jarg1: Long): ByteArray?
     @JvmStatic
     external fun start_recording(): Int
     @JvmStatic
     external fun initialize_playback_device(jarg1: Int, jarg2: Int): Int
     @JvmStatic
-    external fun set_playback_buffer(jarg1: FloatArray?, jarg2: Long): Int
+    external fun set_playback_buffer(jarg1: ByteArray?, jarg2: Long): Int
     @JvmStatic
     external fun uninitialize_playback_device()
     @JvmStatic
@@ -31,7 +31,7 @@ object PandaLoopJNI {
     @JvmStatic
     external fun get_bytes_per_frame(jarg1: Int): Int
     @JvmStatic
-    external fun save_audio_file(jarg1: String?, jarg2: FloatArray?, jarg3: Int, jarg4: Int, jarg5: Int): Int
+    external fun save_audio_file(jarg1: String?, jarg2: ByteArray?, jarg3: Int, jarg4: Int, jarg5: Int): Int
     @JvmStatic
-    external fun load_audio_file(jarg1: Long, jarg2: String?): FloatArray?
+    external fun load_audio_file(jarg1: Long, jarg2: String?): ByteArray?
 }

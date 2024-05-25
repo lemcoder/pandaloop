@@ -4,7 +4,6 @@ import android.Manifest
 import androidx.annotation.RequiresPermission
 import pl.lemanski.pandaloop.core.PandaLoopContext
 import pl.lemanski.pandaloop.core.engine.jni.PandaLoop
-import pl.lemanski.pandaloop.dsp.utils.toByteArray
 
 @RequiresPermission(Manifest.permission.RECORD_AUDIO)
 internal actual fun initializeRecording(sizeInBytes: Long) {
@@ -29,5 +28,5 @@ internal actual fun startRecording() {
 
 @RequiresPermission(Manifest.permission.RECORD_AUDIO)
 internal actual fun stopRecording(sizeInBytes: Long): ByteArray {
-    return PandaLoop.stop_recording(sizeInBytes).toByteArray()
+    return PandaLoop.stop_recording(sizeInBytes) ?: byteArrayOf()
 }
