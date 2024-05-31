@@ -1,28 +1,12 @@
 package pl.lemanski.pandaloop.core
 
-import pl.lemanski.pandaloop.core.engine.initializeRecording
-import pl.lemanski.pandaloop.core.engine.startRecording
-import pl.lemanski.pandaloop.core.engine.stopRecording
-import pl.lemanski.pandaloop.core.engine.uninitializeRecording
-import pl.lemanski.pandaloop.core.internal.Closeable
+import pl.lemanski.pandaloop.core.internal.Recorder
 
-class Recording(private val recordingBufferSize: Long) : Closeable {
-    var recordedBuffer: ByteArray = byteArrayOf()
-        private set
+interface Recording {
+    fun start()
+    fun stop(): ByteArray
+}
 
-    init {
-        initializeRecording(recordingBufferSize)
-    }
-
-    fun start() {
-        startRecording()
-    }
-
-    fun stop() {
-        recordedBuffer = stopRecording(recordingBufferSize)
-    }
-
-    override fun close() {
-        uninitializeRecording()
-    }
+fun recording(bufferSize: Long): Recording {
+    return Recorder(bufferSize)
 }
