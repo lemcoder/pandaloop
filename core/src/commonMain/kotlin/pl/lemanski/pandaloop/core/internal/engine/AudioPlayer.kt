@@ -1,4 +1,4 @@
-package pl.lemanski.pandaloop.core.engine
+package pl.lemanski.pandaloop.core.internal.engine
 
 internal expect fun initializePlaybackDevice()
 internal expect fun uninitializePlaybackDevice()

@@ -19,7 +19,7 @@ include_directories(${JNI_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../native)
 
 set(SWIG_INTERFACE pandaloop.i)
-set(CMAKE_SWIG_FLAGS -package pl.lemanski.pandaloop.core.engine.jni)
+set(CMAKE_SWIG_FLAGS -package pl.lemanski.pandaloop.core.jni)
 
 set_property(SOURCE pandaloop.i PROPERTY SWIG_MODULE_NAME PandaLoop)
 set(PANDALOOP_SOURCES

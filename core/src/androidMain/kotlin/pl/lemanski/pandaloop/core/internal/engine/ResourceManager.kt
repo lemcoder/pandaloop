@@ -1,10 +1,9 @@
-package pl.lemanski.pandaloop.core.engine
+package pl.lemanski.pandaloop.core.internal.engine
 
-import pl.lemanski.pandaloop.core.PandaLoopContext
 import pl.lemanski.pandaloop.core.engine.jni.PandaLoop
 
 internal actual fun saveAudioFile(path: String, buffer: ByteArray) {
-    val result = PandaLoop.save_audio_file(path, buffer, buffer.size, PandaLoopContext.channelCount, PandaLoopContext.sampleRate)
+    val result = PandaLoop.save_audio_file(path, buffer, buffer.size, DefaultAudioEngineOptions.channelCount, DefaultAudioEngineOptions.sampleRate)
     if (result == -1) {
         throw RuntimeException("Failed to save file")
     }

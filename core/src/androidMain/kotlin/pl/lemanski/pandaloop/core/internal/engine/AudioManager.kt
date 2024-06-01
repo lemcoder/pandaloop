@@ -1,6 +1,5 @@
-package pl.lemanski.pandaloop.core.engine
+package pl.lemanski.pandaloop.core.internal.engine
 
-import pl.lemanski.pandaloop.core.PandaLoopContext
 import pl.lemanski.pandaloop.core.engine.jni.PandaLoop
 
 internal actual fun getPlaybackDevicesCount(): Int {
@@ -8,5 +7,5 @@ internal actual fun getPlaybackDevicesCount(): Int {
 }
 
 internal actual fun getBytesPerFrame(): Int {
-    return PandaLoop.get_bytes_per_frame(PandaLoopContext.channelCount)
+    return PandaLoop.get_bytes_per_frame(DefaultAudioEngineOptions.channelCount)
 }

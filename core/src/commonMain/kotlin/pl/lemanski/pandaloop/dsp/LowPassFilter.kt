@@ -1,6 +1,6 @@
 package pl.lemanski.pandaloop.dsp
 
-import pl.lemanski.pandaloop.core.PandaLoopContext
+import pl.lemanski.pandaloop.core.internal.engine.DefaultAudioEngineOptions
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -9,7 +9,7 @@ class LowPassFilter(
     private val input: FloatArray,
 ) : Filter {
     private val PI: Float = 3.1415927f
-    private val FC: Float = cutoffHz.coerceIn(20, 20_000).toFloat() / PandaLoopContext.sampleRate.toFloat() // Filter cutoff
+    private val FC: Float = cutoffHz.coerceIn(20, 20_000).toFloat() / DefaultAudioEngineOptions.sampleRate.toFloat() // Filter cutoff
     private val M: Int = 100 // Filter length
     private val H: FloatArray = FloatArray(101) // Low-pass filter kernel
 

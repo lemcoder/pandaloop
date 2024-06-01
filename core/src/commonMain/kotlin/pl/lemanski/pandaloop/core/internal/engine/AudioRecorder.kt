@@ -1,4 +1,4 @@
-package pl.lemanski.pandaloop.core.engine
+package pl.lemanski.pandaloop.core.internal.engine
 
 internal expect fun initializeRecording(sizeInBytes: Long)
 internal expect fun uninitializeRecording()

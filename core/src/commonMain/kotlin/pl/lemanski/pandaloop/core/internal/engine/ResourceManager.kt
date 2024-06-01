@@ -1,4 +1,4 @@
-package pl.lemanski.pandaloop.core.engine
+package pl.lemanski.pandaloop.core.internal.engine
 
 internal expect fun saveAudioFile(path: String, buffer: ByteArray)
 

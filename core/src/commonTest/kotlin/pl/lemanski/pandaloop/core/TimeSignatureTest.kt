@@ -1,5 +1,8 @@
 package pl.lemanski.pandaloop.core
 
+import pl.lemanski.pandaloop.core.internal.engine.DefaultAudioEngine
+import pl.lemanski.pandaloop.core.internal.engine.DefaultAudioEngineOptions
+import pl.lemanski.pandaloop.core.utils.getTimeWithTempo
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -12,8 +15,15 @@ class TimeSignatureTest {
 
     @Test
     fun shouldGetCorrectBufferSize() {
-        PandaLoopContext.sampleRate
-        val bufferSize = TimeSignature.COMMON.getBufferSizeInBytesWithTempo(90, 4)
-        assertEquals(470_804.0, bufferSize.toDouble(), 500.0)
+        DefaultAudioEngineOptions.sampleRate
+        val testOptions = object : AudioEngine.Options {
+            override val channelCount: Int = 1
+            override val sampleRate: Int = 44_100
+            override val bytesPerFrame: Int = 4
+
+        }
+        val pandaLoop = PandaLoop(engine = DefaultAudioEngine(testOptions))
+        val bufferSize = pandaLoop.getBufferSizeInBytesWithTempo(TimeSignature.COMMON, 90)
+        assertEquals(470_804.0, bufferSize.toDouble(), 500.0) // FIXME
     }
 }

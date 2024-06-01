@@ -1,4 +1,4 @@
-package pl.lemanski.pandaloop.core.engine
+package pl.lemanski.pandaloop.core.internal.engine
 
 import kotlinx.cinterop.*
 import pl.lemanski.pandaloop.engine.*

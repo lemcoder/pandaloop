@@ -7,11 +7,11 @@ import androidx.test.rule.GrantPermissionRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import pl.lemanski.pandaloop.core.engine.initializeRecording
-import pl.lemanski.pandaloop.core.engine.saveAudioFile
-import pl.lemanski.pandaloop.core.engine.startRecording
-import pl.lemanski.pandaloop.core.engine.stopRecording
-import pl.lemanski.pandaloop.core.engine.uninitializeRecording
+import pl.lemanski.pandaloop.core.internal.engine.initializeRecording
+import pl.lemanski.pandaloop.core.internal.engine.saveAudioFile
+import pl.lemanski.pandaloop.core.internal.engine.startRecording
+import pl.lemanski.pandaloop.core.internal.engine.stopRecording
+import pl.lemanski.pandaloop.core.internal.engine.uninitializeRecording
 import java.io.File
 
 class ResourceManagerTest {

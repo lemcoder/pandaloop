@@ -1,13 +1,12 @@
-package pl.lemanski.pandaloop.core.engine
+package pl.lemanski.pandaloop.core.internal.engine
 
 import android.Manifest
 import androidx.annotation.RequiresPermission
-import pl.lemanski.pandaloop.core.PandaLoopContext
 import pl.lemanski.pandaloop.core.engine.jni.PandaLoop
 
 @RequiresPermission(Manifest.permission.RECORD_AUDIO)
 internal actual fun initializeRecording(sizeInBytes: Long) {
-    val result = PandaLoop.initialize_recording(sizeInBytes, PandaLoopContext.channelCount, PandaLoopContext.sampleRate)
+    val result = PandaLoop.initialize_recording(sizeInBytes, DefaultAudioEngineOptions.channelCount, DefaultAudioEngineOptions.sampleRate)
     if (result != 0) {
         throw RuntimeException("Failed to initialize recording device")
     }
