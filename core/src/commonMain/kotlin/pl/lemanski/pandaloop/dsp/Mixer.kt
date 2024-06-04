@@ -16,14 +16,12 @@ class Mixer {
             return output
         }
 
-        val sampleCount: Int = output.size * DefaultAudioEngineOptions.channelCount
-
         if (volume == 1f) {
-            for (i in 0 until sampleCount) {
+            for (i in output.indices) {
                 output[i] += input[i]
             }
         } else {
-            for (i in 0 until sampleCount) {
+            for (i in output.indices) {
                 output[i] += (input[i] * volume)
             }
         }

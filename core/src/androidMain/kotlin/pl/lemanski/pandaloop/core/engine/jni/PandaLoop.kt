@@ -7,7 +7,7 @@
  * ----------------------------------------------------------------------------- */
 package pl.lemanski.pandaloop.core.engine.jni
 
-object PandaLoop {
+internal object PandaLoop {
     init {
         System.loadLibrary("pl_engine_swig")
     }

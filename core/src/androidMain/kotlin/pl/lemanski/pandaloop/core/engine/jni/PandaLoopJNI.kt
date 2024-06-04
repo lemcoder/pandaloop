@@ -7,7 +7,7 @@
  * ----------------------------------------------------------------------------- */
 package pl.lemanski.pandaloop.core.engine.jni
 
-object PandaLoopJNI {
+internal object PandaLoopJNI {
     @JvmStatic
     external fun initialize_recording(jarg1: Long, jarg2: Int, jarg3: Int): Int
     @JvmStatic

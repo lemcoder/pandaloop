@@ -5,7 +5,7 @@ import pl.lemanski.pandaloop.core.utils.getTimeWithTempo
 import kotlin.math.round
 
 class PandaLoop(
-    private val engine: AudioEngine = DefaultAudioEngine(),
+    internal val engine: AudioEngine = DefaultAudioEngine(),
 ) {
     /**
      * Set the buffer to be played. Should be called before starting playback.
@@ -87,22 +87,5 @@ class PandaLoop(
      */
     fun loadAudioFile(path: String, fileSize: Long): ByteArray {
         return engine.loadAudioFile(path, fileSize)
-    }
-
-    /**
-     * Get buffer size in bytes for given time signature and tempo
-     * @param timeSignature time signature to use for calculation
-     * @param tempo tempo to use for calculation
-     *
-     * @return buffer size in bytes
-     */
-    fun getBufferSizeInBytesWithTempo(timeSignature: TimeSignature, tempo: Int): Long {
-        val timeInMs = timeSignature.getTimeWithTempo(tempo)
-
-        val bufferSize = round(
-            engine.options.sampleRate.toDouble() * engine.options.channelCount * engine.options.bytesPerFrame * (timeInMs / 1000.0)
-        ).toLong()
-
-        return bufferSize
     }
 }

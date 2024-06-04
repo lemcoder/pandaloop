@@ -13,7 +13,8 @@ int save_audio_file(const char *pFilePath, void *pBuffer, int bufferSize, int ch
     }
 
     ma_uint64 framesWritten = 0;
-    if (ma_encoder_write_pcm_frames(&encoder, pBuffer, bufferSize, &framesWritten) != MA_SUCCESS) {
+    ma_uint32 bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, channelCount);
+    if (ma_encoder_write_pcm_frames(&encoder, pBuffer, bufferSize / bytesPerFrame, &framesWritten) != MA_SUCCESS) {
         ma_encoder_uninit(&encoder);
         LOGE("Failed to write audio data");
         return MA_ERROR;
