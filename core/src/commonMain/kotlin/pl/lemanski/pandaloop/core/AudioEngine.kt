@@ -27,15 +27,15 @@ interface AudioEngine {
     val options: Options
 
     fun getPlaybackDevicesCount(): Int = internalGetPlaybackDevicesCount()
-    fun initializePlaybackDevice() = internalInitializePlaybackDevice()
+    fun initializePlaybackDevice() = internalInitializePlaybackDevice(options.channelCount, options.sampleRate)
     fun uninitializePlaybackDevice() = internalUninitializePlaybackDevice()
     fun setPlaybackBuffer(buffer: ByteArray) = internalSetPlaybackBuffer(buffer)
     fun startPlayback() = internalStartPlayback()
     fun stopPlayback() = internalStopPlayback()
-    fun initializeRecording(sizeInBytes: Long) = internalInitializeRecording(sizeInBytes)
+    fun initializeRecording(sizeInBytes: Long) = internalInitializeRecording(sizeInBytes, options.channelCount, options.sampleRate)
     fun uninitializeRecording() = internalUninitializeRecording()
     fun startRecording() = internalStartRecording()
     fun stopRecording(sizeInBytes: Long): ByteArray = internalStopRecording(sizeInBytes)
-    fun saveAudioFile(path: String, buffer: ByteArray) = internalSaveAudioFile(path, buffer)
+    fun saveAudioFile(path: String, buffer: ByteArray) = internalSaveAudioFile(path, buffer, options.channelCount, options.sampleRate)
     fun loadAudioFile(path: String, fileSize: Long): ByteArray = internalLoadAudioFile(path, fileSize)
 }

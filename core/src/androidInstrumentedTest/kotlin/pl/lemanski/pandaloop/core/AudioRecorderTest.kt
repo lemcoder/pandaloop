@@ -15,7 +15,7 @@ class AudioRecorderTest {
 
     @Test
     fun shouldWriteAudioToBuffer() {
-        initializeRecording(441)
+        initializeRecording(441,,)
         startRecording()
         val buffer = stopRecording(441)
         assert(buffer.isNotEmpty())

@@ -1,4 +1,3 @@
-import com.android.build.gradle.internal.tasks.factory.registerTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
@@ -6,7 +5,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
-    // alias(libs.plugins.cklib)
+    alias(libs.plugins.cklib)
     `maven-publish`
 }
 
@@ -34,32 +33,34 @@ android {
     }
 }
 
-//cklib {
-//    config.kotlinVersion = libs.versions.kotlin.get()
-//    create("pl_engine") {
-//        language = co.touchlab.cklib.gradle.CompileToBitcode.Language.C
-//        srcDirs = project.files(file("native"))
-//        linkerArgs += listOf(
-//            "-lpthread",
-//            "-lm",
-//            "-framework CoreFoundation",
-//            "-framework CoreAudio",
-//            "-framework AudioToolbox"
-//        )
-//    }
-//}
+cklib {
+    config.kotlinVersion = libs.versions.kotlin.get()
+
+    create("pl_engine") {
+        language = co.touchlab.cklib.gradle.CompileToBitcode.Language.C
+        srcDirs = project.files(file("native"))
+        headersDirs = project.files(file("native"))
+        linkerArgs += listOf(
+            "-lpthread",
+            "-lm",
+            "-framework CoreFoundation",
+            "-framework CoreAudio",
+            "-framework AudioToolbox"
+        )
+    }
+}
 
 kotlin {
     jvmToolchain(17)
 
-    val xcFrameworkName = "PandaLoop"
+    val xcFrameworkName = "pandaloop"
     val xcf = XCFramework(xcFrameworkName)
-    val iosTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64())
+    val iosTargets = listOf(iosArm64())
 
     iosTargets.forEach {
         it.binaries.framework {
             baseName = xcFrameworkName
-            binaryOption("bundleId", "org.example.${xcFrameworkName}")
+            binaryOption("bundleId", "pl.lemanski.${xcFrameworkName}")
 
             xcf.add(this)
             isStatic = true

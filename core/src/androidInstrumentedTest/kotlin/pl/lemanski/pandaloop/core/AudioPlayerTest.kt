@@ -28,7 +28,7 @@ class AudioPlayerTest {
     var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO)
 
     private fun recordSound(sizeInBytes: Long = 44100 * 4): ByteArray {
-        initializeRecording(sizeInBytes)
+        initializeRecording(sizeInBytes,,)
         startRecording()
         Thread.sleep(sizeInBytes / 44100 * 1000L)
         return stopRecording(sizeInBytes)
@@ -36,7 +36,7 @@ class AudioPlayerTest {
 
     @Test
     fun shouldPlayAudioFromBuffer() {
-        initializePlaybackDevice()
+        initializePlaybackDevice(,)
         val buffer = recordSound()
         setPlaybackBuffer(buffer)
         startPlayback()

@@ -5,8 +5,8 @@ import kotlinx.cinterop.toCValues
 import pl.lemanski.pandaloop.engine.save_audio_file
 
 @OptIn(ExperimentalForeignApi::class)
-internal actual fun saveAudioFile(path: String, buffer: ByteArray) {
-    val result = save_audio_file(path, buffer.toCValues(), buffer.size)
+internal actual fun saveAudioFile(path: String, buffer: ByteArray, channelCount: Int, sampleRate: Int) {
+    val result = save_audio_file(path, buffer.toCValues(), buffer.size, channelCount, sampleRate)
     if (result == -1) {
         throw RuntimeException("Failed to save file")
     }

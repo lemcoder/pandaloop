@@ -8,5 +8,5 @@ internal object DefaultAudioEngineOptions : AudioEngine.Options {
     override var sampleRate: Int = 44_100
         private set
     override val bytesPerFrame: Int
-        get() = getBytesPerFrame()
+        get() = getBytesPerFrame(channelCount)
 }

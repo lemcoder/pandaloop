@@ -2,8 +2,8 @@ package pl.lemanski.pandaloop.core.internal.engine
 
 import pl.lemanski.pandaloop.core.engine.jni.PandaLoop
 
-internal actual fun initializePlaybackDevice() {
-    val result = PandaLoop.initialize_playback_device(DefaultAudioEngineOptions.channelCount, DefaultAudioEngineOptions.sampleRate)
+internal actual fun initializePlaybackDevice(channelCount: Int, sampleRate: Int) {
+    val result = PandaLoop.initialize_playback_device(channelCount, sampleRate)
     if (result != 0) {
         throw RuntimeException("Failed to initialize playback device")
     }
