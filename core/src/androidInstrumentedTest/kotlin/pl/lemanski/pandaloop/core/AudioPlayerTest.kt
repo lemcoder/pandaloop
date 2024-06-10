@@ -7,14 +7,14 @@ import androidx.test.rule.GrantPermissionRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import pl.lemanski.pandaloop.core.engine.initializePlaybackDevice
-import pl.lemanski.pandaloop.core.engine.initializeRecording
-import pl.lemanski.pandaloop.core.engine.setPlaybackBuffer
-import pl.lemanski.pandaloop.core.engine.startPlayback
-import pl.lemanski.pandaloop.core.engine.startRecording
-import pl.lemanski.pandaloop.core.engine.stopPlayback
-import pl.lemanski.pandaloop.core.engine.stopRecording
-import pl.lemanski.pandaloop.core.engine.uninitializePlaybackDevice
+import pl.lemanski.pandaloop.core.internal.engine.initializePlaybackDevice
+import pl.lemanski.pandaloop.core.internal.engine.initializeRecording
+import pl.lemanski.pandaloop.core.internal.engine.setPlaybackBuffer
+import pl.lemanski.pandaloop.core.internal.engine.startPlayback
+import pl.lemanski.pandaloop.core.internal.engine.startRecording
+import pl.lemanski.pandaloop.core.internal.engine.stopPlayback
+import pl.lemanski.pandaloop.core.internal.engine.stopRecording
+import pl.lemanski.pandaloop.core.internal.engine.uninitializePlaybackDevice
 
 class AudioPlayerTest {
     private lateinit var instrumentationContext: Context
@@ -28,7 +28,7 @@ class AudioPlayerTest {
     var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO)
 
     private fun recordSound(sizeInBytes: Long = 44100 * 4): ByteArray {
-        initializeRecording(sizeInBytes)
+        initializeRecording(sizeInBytes,,)
         startRecording()
         Thread.sleep(sizeInBytes / 44100 * 1000L)
         return stopRecording(sizeInBytes)
@@ -36,7 +36,7 @@ class AudioPlayerTest {
 
     @Test
     fun shouldPlayAudioFromBuffer() {
-        initializePlaybackDevice()
+        initializePlaybackDevice(,)
         val buffer = recordSound()
         setPlaybackBuffer(buffer)
         startPlayback()

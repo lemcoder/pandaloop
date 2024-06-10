@@ -37,7 +37,7 @@ static void playback_data_callback(ma_device *pDevice, void *pOutput, const void
     (void) pInput; // Unused parameter
 }
 
-int initialize_playback_device(pandaloop_context *context) {
+int initialize_playback_device(int channelCount, int sampleRate) {
     ma_result result;
     ma_device_config deviceConfig;
     pPlaybackDevice = malloc(sizeof(ma_device));
@@ -48,9 +48,9 @@ int initialize_playback_device(pandaloop_context *context) {
 
     deviceConfig = ma_device_config_init(ma_device_type_playback);
     deviceConfig.playback.format = ma_format_f32;
-    deviceConfig.playback.channels = context->channelCount;
+    deviceConfig.playback.channels = channelCount;
     deviceConfig.noFixedSizedCallback = MA_TRUE;
-    deviceConfig.sampleRate = context->sampleRate;
+    deviceConfig.sampleRate = sampleRate;
     deviceConfig.dataCallback = playback_data_callback;
 
     result = ma_device_init(NULL, &deviceConfig, pPlaybackDevice);
@@ -64,7 +64,7 @@ int initialize_playback_device(pandaloop_context *context) {
     return result;
 }
 
-int set_playback_buffer(float *buffer, ma_uint64 sizeInBytes) {
+int set_playback_buffer(void *buffer, long long int sizeInBytes) {
     if (pPlaybackDevice == NULL) {
         LOGE("Device was not initialized. Call initialize first.");
         return MA_ERROR;

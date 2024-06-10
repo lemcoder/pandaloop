@@ -1,4 +1,5 @@
 #include "audio_recorder.h"
+#include <jni.h>
 
 #ifndef PANDALOOP_AUDIORECORDER_C
 #define PANDALOOP_AUDIORECORDER_C
@@ -36,15 +37,15 @@ static void capture_data_callback(ma_device *pDevice, void *pOutput, const void 
     (void) pOutput;
 }
 
-int initialize_recording(ma_uint64 sizeInBytes, pandaloop_context *context) {
+int initialize_recording(long long int sizeInBytes, int channelCount, int sampleRate) {
     ma_result result;
     ma_device_config deviceConfig;
 
     deviceConfig = ma_device_config_init(ma_device_type_capture);
     deviceConfig.capture.format = ma_format_f32;
-    deviceConfig.capture.channels = context->channelCount;
+    deviceConfig.capture.channels = channelCount;
     deviceConfig.noFixedSizedCallback = MA_TRUE;
-    deviceConfig.sampleRate = context->sampleRate;
+    deviceConfig.sampleRate = sampleRate;
     deviceConfig.dataCallback = capture_data_callback;
 
     result = ma_device_init(NULL, &deviceConfig, &device);
@@ -54,7 +55,7 @@ int initialize_recording(ma_uint64 sizeInBytes, pandaloop_context *context) {
     }
 
     requiredSizeBytes = sizeInBytes;
-    bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, context->channelCount);
+    bytesPerFrame = ma_get_bytes_per_frame(ma_format_f32, channelCount);
     pCaptureBuffer = calloc(sizeInBytes, 1);
 
     if (pCaptureBuffer == NULL) {
@@ -74,10 +75,14 @@ void uninitialize_recording() {
     LOGD("Uninitialized recording");
 }
 
-void *stop_recording() {
+void *stop_recording(long long int sizeInBytes) {
     ma_device_stop(&device);
     LOGD("Stopped recording");
-    return pCaptureBuffer;
+
+    void *tmpBuffer = malloc(sizeInBytes);
+    memcpy(tmpBuffer, pCaptureBuffer, sizeInBytes);
+
+    return tmpBuffer;
 }
 
 int start_recording() {
@@ -98,3 +103,15 @@ int start_recording() {
 }
 
 #endif //PANDALOOP_AUDIORECORDER_C
+
+
+
+
+
+
+
+
+
+
+
+

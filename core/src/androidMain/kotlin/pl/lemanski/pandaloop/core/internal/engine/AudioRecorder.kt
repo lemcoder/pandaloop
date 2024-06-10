@@ -1,11 +1,12 @@
-package pl.lemanski.pandaloop.core.engine
+package pl.lemanski.pandaloop.core.internal.engine
 
 import android.Manifest
 import androidx.annotation.RequiresPermission
+import pl.lemanski.pandaloop.core.engine.jni.PandaLoop
 
 @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-internal actual fun initializeRecording(sizeInBytes: Long) {
-    val result = NativeInterface.Instance.initialize_recording(sizeInBytes)
+internal actual fun initializeRecording(sizeInBytes: Long, channelCount: Int, sampleRate: Int) {
+    val result = PandaLoop.initialize_recording(sizeInBytes, channelCount, sampleRate)
     if (result != 0) {
         throw RuntimeException("Failed to initialize recording device")
     }
@@ -13,12 +14,12 @@ internal actual fun initializeRecording(sizeInBytes: Long) {
 
 @RequiresPermission(Manifest.permission.RECORD_AUDIO)
 internal actual fun uninitializeRecording() {
-    NativeInterface.Instance.uninitialize_recording()
+    PandaLoop.uninitialize_recording()
 }
 
 @RequiresPermission(Manifest.permission.RECORD_AUDIO)
 internal actual fun startRecording() {
-    val result = NativeInterface.Instance.start_recording()
+    val result = PandaLoop.start_recording()
     if (result != 0) {
         throw RuntimeException("Failed to start recording")
     }
@@ -26,6 +27,5 @@ internal actual fun startRecording() {
 
 @RequiresPermission(Manifest.permission.RECORD_AUDIO)
 internal actual fun stopRecording(sizeInBytes: Long): ByteArray {
-    val pointer = NativeInterface.Instance.stop_recording()
-    return pointer.getByteArray(0, sizeInBytes.toInt().coerceAtLeast(0))
+    return PandaLoop.stop_recording(sizeInBytes) ?: byteArrayOf()
 }

@@ -1,6 +1,6 @@
 package pl.lemanski.pandaloop.dsp
 
-import pl.lemanski.pandaloop.core.PandaLoopContext
+import pl.lemanski.pandaloop.core.internal.engine.DefaultAudioEngineOptions
 
 class Mixer {
     fun mixPcmFramesF32(input: FloatArray, output: FloatArray, volume: Float): FloatArray {
@@ -16,14 +16,12 @@ class Mixer {
             return output
         }
 
-        val sampleCount: Int = output.size * PandaLoopContext.channelCount
-
         if (volume == 1f) {
-            for (i in 0 until sampleCount) {
+            for (i in output.indices) {
                 output[i] += input[i]
             }
         } else {
-            for (i in 0 until sampleCount) {
+            for (i in output.indices) {
                 output[i] += (input[i] * volume)
             }
         }

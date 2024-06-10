@@ -1,10 +1,11 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
-    // alias(libs.plugins.cklib)
+    alias(libs.plugins.cklib)
     `maven-publish`
 }
 
@@ -16,7 +17,6 @@ android {
 
     defaultConfig {
         minSdk = 24
-        multiDexEnabled = true
         namespace = "pl.lemanski.pandaloop"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -33,32 +33,34 @@ android {
     }
 }
 
-//cklib {
-//    config.kotlinVersion = libs.versions.kotlin.get()
-//    create("pl_engine") {
-//        language = co.touchlab.cklib.gradle.CompileToBitcode.Language.C
-//        srcDirs = project.files(file("native"))
-//        linkerArgs += listOf(
-//            "-lpthread",
-//            "-lm",
-//            "-framework CoreFoundation",
-//            "-framework CoreAudio",
-//            "-framework AudioToolbox"
-//        )
-//    }
-//}
+cklib {
+    config.kotlinVersion = libs.versions.kotlin.get()
+
+    create("pl_engine") {
+        language = co.touchlab.cklib.gradle.CompileToBitcode.Language.C
+        srcDirs = project.files(file("native"))
+        headersDirs = project.files(file("native"))
+        linkerArgs += listOf(
+            "-lpthread",
+            "-lm",
+            "-framework CoreFoundation",
+            "-framework CoreAudio",
+            "-framework AudioToolbox"
+        )
+    }
+}
 
 kotlin {
     jvmToolchain(17)
 
-    val xcFrameworkName = "PandaLoop"
+    val xcFrameworkName = "pandaloop"
     val xcf = XCFramework(xcFrameworkName)
-    val iosTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64())
+    val iosTargets = listOf(iosArm64())
 
     iosTargets.forEach {
         it.binaries.framework {
             baseName = xcFrameworkName
-            binaryOption("bundleId", "org.example.${xcFrameworkName}")
+            binaryOption("bundleId", "pl.lemanski.${xcFrameworkName}")
 
             xcf.add(this)
             isStatic = true
@@ -66,13 +68,14 @@ kotlin {
     }
 
     androidTarget {
-        publishLibraryVariants("release")
+        publishAllLibraryVariants()
     }
 
     applyDefaultHierarchyTemplate()
     sourceSets {
         all {
             languageSettings {
+                @OptIn(ExperimentalKotlinGradlePluginApi::class)
                 compilerOptions {
                     freeCompilerArgs.add("-Xexpect-actual-classes")
                 }
@@ -87,8 +90,6 @@ kotlin {
         }
 
         androidMain.dependencies {
-            // https://github.com/gradle/gradle/issues/16665
-            implementation("net.java.dev.jna:jna:5.14.0@aar")
             implementation(libs.androidX.annotation)
         }
 
@@ -113,5 +114,17 @@ kotlin {
                 )
             }
         }
+    }
+}
+
+tasks.register("moveSWIGFiles") {
+    copy {
+        from("src/androidMain/cpp/.swig/*.java")
+        to("src/androidMain/kotlin/pl/lemanski/pandaloop/jni")
+    }
+
+    copy {
+        from("src/androidMain/cpp/.swig/*.c")
+        to("native/jni")
     }
 }

@@ -1,4 +1,4 @@
-package pl.lemanski.pandaloop.core.engine
+package pl.lemanski.pandaloop.core.internal.engine
 
 import kotlinx.cinterop.*
 import pl.lemanski.pandaloop.engine.*
@@ -10,6 +10,6 @@ internal actual fun getPlaybackDevicesCount(): Int {
 
 
 @OptIn(ExperimentalForeignApi::class)
-internal actual fun getBytesPerFrame(): Int {
-    return get_bytes_per_frame()
+internal actual fun getBytesPerFrame(channelCount: Int): Int {
+    return get_bytes_per_frame(channelCount)
 }

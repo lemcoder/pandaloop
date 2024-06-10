@@ -5,11 +5,10 @@
 #include <stdlib.h>
 #include "miniaudio/miniaudio.h"
 #include "logging.h"
-#include "pandaloop_context.h"
 
-int initialize_playback_device(pandaloop_context *context);
+int initialize_playback_device(int channelCount, int sampleRate);
 
-int set_playback_buffer(float *buffer, ma_uint64 sizeInBytes);
+int set_playback_buffer(void *buffer, long long int sizeInBytes);
 
 void uninitialize_playback_device();
 
